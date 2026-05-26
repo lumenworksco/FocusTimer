@@ -1,0 +1,70 @@
+import SwiftUI
+
+struct SettingsView: View {
+    @ObservedObject var vm: TimerViewModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+
+            sectionLabel("Durations", icon: "clock")
+
+            card {
+                settingRow("Work session") {
+                    Stepper("\(vm.workDuration) min", value: $vm.workDuration, in: 1...90)
+                }
+                Divider()
+                settingRow("Short break") {
+                    Stepper("\(vm.shortBreakDuration) min", value: $vm.shortBreakDuration, in: 1...30)
+                }
+                Divider()
+                settingRow("Long break") {
+                    Stepper("\(vm.longBreakDuration) min", value: $vm.longBreakDuration, in: 5...60)
+                }
+            }
+
+            sectionLabel("Behavior", icon: "gearshape")
+
+            card {
+                settingRow("Sessions before long break") {
+                    Stepper("\(vm.sessionsBeforeLongBreak)", value: $vm.sessionsBeforeLongBreak, in: 2...8)
+                }
+                Divider()
+                settingRow("Notifications") {
+                    Toggle("", isOn: $vm.notificationsEnabled)
+                        .labelsHidden()
+                        .onChange(of: vm.notificationsEnabled) { enabled in
+                            if enabled { NotificationManager.shared.requestPermission() }
+                        }
+                }
+            }
+        }
+        .padding(16)
+        .frame(width: 320)
+    }
+
+    // MARK: - Subviews
+
+    private func sectionLabel(_ text: String, icon: String) -> some View {
+        Label(text, systemImage: icon)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .padding(.leading, 2)
+    }
+
+    private func card<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(spacing: 0) { content() }
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.07), lineWidth: 1))
+    }
+
+    private func settingRow<T: View>(_ label: String, @ViewBuilder trailing: () -> T) -> some View {
+        HStack {
+            Text(label).font(.callout)
+            Spacer()
+            trailing()
+        }
+        .padding(.horizontal, 14)
+        .frame(height: 38)
+    }
+}
