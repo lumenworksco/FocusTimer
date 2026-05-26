@@ -19,18 +19,24 @@
 - **macOS notifications** — get alerted when each session completes
 - **Zero accounts, zero tracking** — everything stored locally
 
-## Requirements
+## Download
 
-- macOS 13.0 Ventura or later
-- Apple Silicon or Intel
+<div align="center">
 
-## Installation
+<a href="https://github.com/lumenworksco/FocusTimer/releases/latest">
+  <img src="https://img.shields.io/badge/Download_for_macOS-%23000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS" height="48"/>
+</a>
 
-### Download (Recommended)
+<br/>
+<sub>macOS 13.0 Ventura or later &nbsp;·&nbsp; Apple Silicon &amp; Intel &nbsp;·&nbsp; Free &amp; open source</sub>
+
+</div>
+
+<br/>
 
 1. Download **FocusTimer.zip** from the [latest release](https://github.com/lumenworksco/FocusTimer/releases/latest)
 2. Unzip and drag `FocusTimer.app` to your **Applications** folder
-3. Double-click to launch — the `⏱` icon will appear in your menu bar
+3. Double-click to launch — the `⏱` icon appears in your menu bar
 
 > **First launch:** macOS may show a security prompt. Go to **System Settings → Privacy & Security** and click **Open Anyway**.
 
