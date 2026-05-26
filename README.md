@@ -34,9 +34,9 @@
 
 <br/>
 
-1. Download **FocusTimer.zip** from the [latest release](https://github.com/lumenworksco/FocusTimer/releases/latest)
-2. Unzip and drag `FocusTimer.app` to your **Applications** folder
-3. Double-click to launch — the `⏱` icon appears in your menu bar
+1. Download **FocusTimer.dmg** from the [latest release](https://github.com/lumenworksco/FocusTimer/releases/latest)
+2. Open it and drag `FocusTimer.app` into the **Applications** folder
+3. Launch it — the `⏱` icon appears in your menu bar
 
 > **First launch:** macOS may show a security prompt. Go to **System Settings → Privacy & Security** and click **Open Anyway**.
 
