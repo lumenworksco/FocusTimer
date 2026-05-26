@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusTimer — Pomodoro timer for macOS</title>
+  <meta name="description" content="A beautiful, minimal Pomodoro timer that lives in your macOS menu bar. Free and open source." />
+  <meta property="og:title" content="FocusTimer — Pomodoro timer for macOS" />
+  <meta property="og:description" content="Beautiful, minimal Pomodoro timer for your macOS menu bar. Free & open source." />
+  <meta property="og:image" content="https://lumenworksco.github.io/FocusTimer/screenshot.png" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #080810;
+      --surface:  #111118;
+      --card:     #16161f;
+      --border:   rgba(255,255,255,0.07);
+      --accent:   #ff3b30;
+      --glow:     rgba(255,59,48,0.25);
+      --green:    #30d158;
+      --text:     #f2f2f7;
+      --text2:    #aeaebb;
+      --text3:    #5e5e70;
+      --radius:   14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 60px;
+      background: rgba(8,8,16,0.8);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 17px; font-weight: 600; color: var(--text); text-decoration: none;
+    }
+    .nav-logo svg { width: 26px; height: 26px; }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-link {
+      color: var(--text2); text-decoration: none; font-size: 14px;
+      transition: color .2s;
+    }
+    .nav-link:hover { color: var(--text); }
+    .nav-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 8px;
+      background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+      color: var(--text); text-decoration: none; font-size: 13px;
+      transition: background .2s;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.12); }
+
+    /* ── Hero ── */
+    .hero {
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 60px;
+      max-width: 1080px; margin: 0 auto;
+      padding: 100px 40px 80px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 100px;
+      background: rgba(255,59,48,0.12); border: 1px solid rgba(255,59,48,0.25);
+      color: var(--accent); font-size: 12px; font-weight: 500;
+      margin-bottom: 24px;
+    }
+    .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+      animation: pulse-dot 2s ease-in-out infinite; }
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:.5; transform:scale(.8); }
+    }
+    h1 {
+      font-size: clamp(38px, 5vw, 56px);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .hero-sub {
+      font-size: 18px; color: var(--text2); line-height: 1.6;
+      max-width: 420px; margin-bottom: 40px;
+    }
+    .cta-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 12px;
+      background: var(--accent); color: #fff;
+      font-size: 16px; font-weight: 600; text-decoration: none;
+      box-shadow: 0 8px 32px var(--glow);
+      transition: transform .15s, box-shadow .15s, filter .15s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 12px 40px var(--glow); }
+    .btn-primary:active { transform: translateY(0); }
+    .cta-meta { font-size: 13px; color: var(--text3); }
+
+    /* ── App Mockup ── */
+    .hero-visual {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+
+    /* Menu bar strip */
+    .menubar-strip {
+      width: 360px; height: 36px;
+      background: #1a1a2e; border-radius: 8px 8px 0 0;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 0 14px; gap: 16px;
+      font-size: 12px; color: rgba(255,255,255,0.5);
+    }
+    .mb-item { display: flex; align-items: center; gap: 4px; }
+    .mb-timer {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.1); padding: 3px 9px;
+      border-radius: 5px; color: rgba(255,255,255,0.85); font-weight: 500;
+    }
+
+    /* Popup card */
+    .popup {
+      width: 300px;
+      background: #1c1c26;
+      border-radius: 0 0 16px 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-top: none;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(255,255,255,0.05);
+      padding: 20px;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+    .popup-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .popup-session {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 15px; font-weight: 600;
+    }
+    .popup-session svg { color: var(--accent); }
+    .popup-gear { color: rgba(255,255,255,0.3); cursor: pointer; }
+
+    /* Ring */
+    .ring-wrap {
+      position: relative; width: 180px; height: 180px;
+      margin: 0 auto 16px;
+    }
+    .ring-wrap svg { width: 180px; height: 180px; }
+    .ring-track { fill: none; stroke: rgba(255,255,255,0.07); stroke-width: 10; }
+    .ring-glow  {
+      fill: none; stroke: var(--accent); stroke-width: 22; stroke-linecap: round;
+      filter: blur(8px); opacity: .35;
+      transform-origin: center; transform: rotate(-90deg);
+      stroke-dasharray: 471; stroke-dashoffset: 353;
+      animation: ring-anim 90s linear forwards;
+    }
+    .ring-arc   {
+      fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round;
+      transform-origin: center; transform: rotate(-90deg);
+      stroke-dasharray: 471; stroke-dashoffset: 353;
+      animation: ring-anim 90s linear forwards;
+    }
+    @keyframes ring-anim {
+      from { stroke-dashoffset: 353; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .ring-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px;
+    }
+    .ring-time {
+      font-size: 42px; font-weight: 100;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -1px;
+      font-family: 'SF Mono', 'Menlo', monospace;
+    }
+    .ring-status { font-size: 11px; color: var(--text3); }
+
+    /* Dots */
+    .popup-dots {
+      display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;
+    }
+    .pdot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .pdot.on  { background: var(--accent); transform: scale(1.2); }
+    .pdot.off { background: rgba(255,255,255,0.15); }
+
+    /* Buttons */
+    .popup-controls {
+      display: flex; gap: 10px; margin-bottom: 14px;
+    }
+    .pbtn {
+      flex: 1; padding: 8px 0; border-radius: 8px; border: none;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      background: rgba(255,255,255,0.08); color: var(--text);
+    }
+    .pbtn.primary {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 4px 16px var(--glow);
+    }
+
+    /* Footer row */
+    .popup-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 12px; color: rgba(255,255,255,0.3);
+    }
+    .popup-footer .completed { display: flex; align-items: center; gap: 5px; }
+    .check-icon { color: var(--accent); }
+
+    /* ── Features ── */
+    .features {
+      max-width: 1080px; margin: 40px auto 0; padding: 80px 40px;
+    }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header h2 { font-size: 36px; font-weight: 700; letter-spacing: -1px; margin-bottom: 12px; }
+    .section-header p { font-size: 17px; color: var(--text2); }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px 24px;
+      transition: border-color .2s, transform .2s;
+    }
+    .feature-card:hover { border-color: rgba(255,255,255,0.14); transform: translateY(-3px); }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(255,59,48,0.12); border: 1px solid rgba(255,59,48,0.2);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px; font-size: 20px;
+    }
+    .feature-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .feature-card p  { font-size: 14px; color: var(--text2); line-height: 1.55; }
+
+    /* ── Download ── */
+    .download {
+      max-width: 600px; margin: 0 auto; padding: 80px 40px 100px;
+      text-align: center;
+    }
+    .download h2 { font-size: 40px; font-weight: 700; letter-spacing: -1px; margin-bottom: 16px; }
+    .download p  { font-size: 17px; color: var(--text2); margin-bottom: 36px; }
+    .btn-download-lg {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 18px 40px; border-radius: 14px;
+      background: var(--accent); color: #fff;
+      font-size: 18px; font-weight: 600; text-decoration: none;
+      box-shadow: 0 12px 40px var(--glow);
+      transition: transform .15s, filter .15s;
+      margin-bottom: 20px;
+    }
+    .btn-download-lg:hover { transform: translateY(-2px); filter: brightness(1.08); }
+    .download-meta { font-size: 13px; color: var(--text3); }
+    .download-meta a { color: var(--text2); text-decoration: underline; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--text3);
+    }
+    footer a { color: var(--text2); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; gap: 24px; }
+
+    /* ── Scroll reveal ── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 800px) {
+      .hero { grid-template-columns: 1fr; text-align: center; padding: 60px 24px 40px; }
+      .hero-sub, .cta-row { max-width: 100%; justify-content: center; }
+      .hero-visual { display: none; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      nav { padding: 0 20px; }
+      .nav-links .nav-link { display: none; }
+    }
+    @media (max-width: 540px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="/" class="nav-logo">
+    <svg viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="11" stroke="#ff3b30" stroke-width="2"/>
+      <circle cx="13" cy="13" r="11" stroke="#ff3b30" stroke-width="2.5" stroke-linecap="round"
+              stroke-dasharray="69" stroke-dashoffset="48" transform="rotate(-90 13 13)"/>
+      <line x1="13" y1="7" x2="13" y2="13" stroke="#ff3b30" stroke-width="2" stroke-linecap="round"/>
+      <line x1="13" y1="13" x2="17" y2="13" stroke="#ff3b30" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    FocusTimer
+  </a>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#download" class="nav-link">Download</a>
+    <a href="https://github.com/lumenworksco/FocusTimer" class="nav-btn" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+      </svg>
+      View on GitHub
+    </a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge"><span></span> v1.0.0 · Free &amp; Open Source</div>
+    <h1>Stay focused.<br><em>One session</em><br>at a time.</h1>
+    <p class="hero-sub">A beautiful Pomodoro timer that lives in your menu bar. No setup, no accounts — just focus.</p>
+    <div class="cta-row">
+      <a href="https://github.com/lumenworksco/FocusTimer/releases/latest/download/FocusTimer.zip" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download for Mac
+      </a>
+      <span class="cta-meta">macOS 13+ &nbsp;·&nbsp; Free</span>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <!-- Menu bar strip -->
+    <div class="menubar-strip">
+      <div class="mb-item">78%</div>
+      <div class="mb-item">97%</div>
+      <div class="mb-timer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        24:37
+      </div>
+      <div class="mb-item">●●●</div>
+    </div>
+
+    <!-- Popup card -->
+    <div class="popup">
+      <div class="popup-header">
+        <div class="popup-session">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Work
+        </div>
+        <svg class="popup-gear" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+      </div>
+
+      <div class="ring-wrap">
+        <svg viewBox="0 0 180 180">
+          <circle class="ring-track" cx="90" cy="90" r="75"/>
+          <circle class="ring-glow"  cx="90" cy="90" r="75"/>
+          <circle class="ring-arc"   cx="90" cy="90" r="75"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-time">24:37</div>
+          <div class="ring-status">in progress</div>
+        </div>
+      </div>
+
+      <div class="popup-dots">
+        <div class="pdot on"></div>
+        <div class="pdot off"></div>
+        <div class="pdot off"></div>
+        <div class="pdot off"></div>
+      </div>
+
+      <div class="popup-controls">
+        <button class="pbtn">Reset</button>
+        <button class="pbtn primary">Pause</button>
+        <button class="pbtn">Skip</button>
+      </div>
+
+      <div class="popup-footer">
+        <div class="completed"><span class="check-icon">✓</span> 1 completed today</div>
+        <div>Quit</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="section-header reveal">
+    <h2>Built for focus</h2>
+    <p>Everything you need. Nothing you don't.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">⏱</div>
+      <h3>Lives in your menu bar</h3>
+      <p>Always one click away. No windows to manage, no dock icon — just a subtle timer in the corner of your screen.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🔴</div>
+      <h3>Animated progress ring</h3>
+      <p>A smooth arc tracks your session with a pulsing red glow when you're in the zone. Calming green for breaks.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🔄</div>
+      <h3>Auto-advance sessions</h3>
+      <p>Automatically moves from work to break to work. Track your cycle with the four pomodoro dots.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🔔</div>
+      <h3>Native notifications</h3>
+      <p>macOS alerts when each session ends so you always know when to take a break — or get back to work.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">⚙️</div>
+      <h3>Fully customizable</h3>
+      <p>Adjust work duration, short break, long break, and how many sessions before a long break.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🔓</div>
+      <h3>Free &amp; open source</h3>
+      <p>MIT licensed. No accounts, no telemetry, no subscriptions. All your data stays on your machine.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Download -->
+<section class="download" id="download">
+  <div class="reveal">
+    <h2>Ready to focus?</h2>
+    <p>Download FocusTimer for free and start your first session in under a minute.</p>
+    <br>
+    <a href="https://github.com/lumenworksco/FocusTimer/releases/latest/download/FocusTimer.zip" class="btn-download-lg">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Download FocusTimer
+    </a>
+    <br>
+    <p class="download-meta">
+      macOS 13.0 or later &nbsp;·&nbsp; Apple Silicon &amp; Intel &nbsp;·&nbsp;
+      <a href="https://github.com/lumenworksco/FocusTimer" target="_blank">View source on GitHub</a>
+    </p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <span>© 2026 lumenworksco</span>
+  <div class="footer-links">
+    <a href="https://github.com/lumenworksco/FocusTimer" target="_blank">GitHub</a>
+    <a href="https://github.com/lumenworksco/FocusTimer/blob/main/LICENSE" target="_blank">MIT License</a>
+    <a href="https://github.com/lumenworksco/FocusTimer/releases" target="_blank">Releases</a>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver(
+    (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
