@@ -7,8 +7,6 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/lumenworksco/FocusTimer?color=red)](https://github.com/lumenworksco/FocusTimer/releases/latest)
 
-![FocusTimer](docs/screenshot.png)
-
 ---
 
 ## Features
