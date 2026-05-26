@@ -116,10 +116,21 @@
     .hero-visual::before {
       content: '';
       position: absolute;
-      width: 280px; height: 280px;
-      background: radial-gradient(circle, rgba(255,59,48,0.12) 0%, transparent 70%);
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,59,48,0.13) 0%, transparent 70%);
       top: 55%; left: 50%; transform: translate(-50%, -50%);
       pointer-events: none; z-index: 0;
+    }
+
+    /* Single wrapper so menubar + popup float together */
+    .app-window {
+      display: flex; flex-direction: column; align-items: center;
+      position: relative; z-index: 1;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-10px); }
     }
 
     /* Menu bar strip */
@@ -132,7 +143,6 @@
       display: flex; align-items: center; justify-content: flex-end;
       padding: 0 14px; gap: 12px;
       font-size: 12px; color: rgba(255,255,255,0.4);
-      position: relative; z-index: 1;
     }
     .mb-item { display: flex; align-items: center; gap: 4px; }
     .mb-timer {
@@ -152,14 +162,8 @@
         0 60px 120px rgba(0,0,0,0.9),
         0 24px 48px rgba(0,0,0,0.5),
         0 0 0 0.5px rgba(255,255,255,0.04),
-        0 0 100px rgba(255,59,48,0.07);
+        0 0 80px rgba(255,59,48,0.08);
       padding: 20px 20px 16px;
-      animation: float 4s ease-in-out infinite;
-      position: relative; z-index: 1;
-    }
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-8px); }
     }
     .popup-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -172,29 +176,19 @@
     .popup-session svg { color: var(--accent); }
     .popup-gear { color: rgba(255,255,255,0.22); cursor: pointer; }
 
-    /* Ring */
+    /* Ring — overflow visible so glow bleeds outside the SVG box */
     .ring-wrap {
       position: relative; width: 200px; height: 200px;
       margin: 0 auto 10px;
+      overflow: visible;
     }
-    .ring-wrap svg { width: 200px; height: 200px; }
+    .ring-wrap svg { width: 200px; height: 200px; overflow: visible; display: block; }
     .ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 10; }
-    .ring-glow {
-      fill: none; stroke: var(--accent); stroke-width: 26; stroke-linecap: round;
-      filter: blur(10px); opacity: .45;
-      transform-origin: center; transform: rotate(-90deg);
-      stroke-dasharray: 515; stroke-dashoffset: 386;
-      animation: ring-anim 90s linear forwards;
-    }
     .ring-arc {
       fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round;
       transform-origin: center; transform: rotate(-90deg);
       stroke-dasharray: 515; stroke-dashoffset: 386;
-      animation: ring-anim 90s linear forwards;
-    }
-    @keyframes ring-anim {
-      from { stroke-dashoffset: 386; }
-      to   { stroke-dashoffset: 0; }
+      filter: drop-shadow(0 0 5px #ff3b30) drop-shadow(0 0 12px rgba(255,59,48,0.55)) drop-shadow(0 0 22px rgba(255,59,48,0.25));
     }
     .ring-center {
       position: absolute; inset: 0;
@@ -359,62 +353,63 @@
   </div>
 
   <div class="hero-visual">
-    <!-- Menu bar strip -->
-    <div class="menubar-strip">
-      <div class="mb-item">78%</div>
-      <div class="mb-item">97%</div>
-      <div class="mb-timer">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-        24:37
-      </div>
-      <div class="mb-item">●●●</div>
-    </div>
-
-    <!-- Popup card -->
-    <div class="popup">
-      <div class="popup-header">
-        <div class="popup-session">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2">
+    <div class="app-window">
+      <!-- Menu bar strip -->
+      <div class="menubar-strip">
+        <div class="mb-item">78%</div>
+        <div class="mb-item">97%</div>
+        <div class="mb-timer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
           </svg>
-          Work
+          <span id="mb-time">18:45</span>
         </div>
-        <svg class="popup-gear" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-        </svg>
+        <div class="mb-item">●●●</div>
       </div>
 
-      <div class="ring-wrap">
-        <svg viewBox="0 0 200 200">
-          <circle class="ring-track" cx="100" cy="100" r="82"/>
-          <circle class="ring-glow"  cx="100" cy="100" r="82"/>
-          <circle class="ring-arc"   cx="100" cy="100" r="82"/>
-        </svg>
-        <div class="ring-center">
-          <div class="ring-time">24:37</div>
-          <div class="ring-status">in progress</div>
+      <!-- Popup card -->
+      <div class="popup">
+        <div class="popup-header">
+          <div class="popup-session">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Work
+          </div>
+          <svg class="popup-gear" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
         </div>
-      </div>
 
-      <div class="popup-dots">
-        <div class="pdot on"></div>
-        <div class="pdot off"></div>
-        <div class="pdot off"></div>
-        <div class="pdot dim"></div>
-      </div>
+        <div class="ring-wrap">
+          <svg viewBox="0 0 200 200" style="overflow:visible">
+            <circle class="ring-track" cx="100" cy="100" r="82"/>
+            <circle class="ring-arc" id="ring-arc" cx="100" cy="100" r="82"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-time" id="ring-time">18:45</div>
+            <div class="ring-status">in progress</div>
+          </div>
+        </div>
 
-      <div class="popup-controls">
-        <button class="pbtn">Reset</button>
-        <button class="pbtn primary">Pause</button>
-        <button class="pbtn">Skip</button>
-      </div>
+        <div class="popup-dots">
+          <div class="pdot on"></div>
+          <div class="pdot off"></div>
+          <div class="pdot off"></div>
+          <div class="pdot dim"></div>
+        </div>
 
-      <div class="popup-footer">
-        <div class="completed"><span class="check-icon">✓</span> 1 completed today</div>
-        <div>Quit</div>
+        <div class="popup-controls">
+          <button class="pbtn">Reset</button>
+          <button class="pbtn primary">Pause</button>
+          <button class="pbtn">Skip</button>
+        </div>
+
+        <div class="popup-footer">
+          <div class="completed"><span class="check-icon">✓</span> 1 completed today</div>
+          <div>Quit</div>
+        </div>
       </div>
     </div>
   </div>
@@ -498,6 +493,43 @@
     { threshold: 0.1 }
   );
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Mockup animation — ring + countdown in sync
+  (function() {
+    const arc    = document.getElementById('ring-arc');
+    const timeEl = document.getElementById('ring-time');
+    const mbTime = document.getElementById('mb-time');
+
+    const CIRC        = 515;   // 2π × 82
+    const START_OFF   = 386;   // 25% filled (18:45 remaining)
+    const DURATION_MS = 90000; // 90-second demo cycle
+    const START_SECS  = 1125;  // 18:45 in seconds
+
+    function fmt(s) {
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ':' + String(sec).padStart(2, '0');
+    }
+
+    let t0 = null;
+    function tick(ts) {
+      if (!t0) t0 = ts;
+      const p = (ts - t0) / DURATION_MS;
+
+      if (p >= 1) { t0 = ts; requestAnimationFrame(tick); return; }
+
+      const offset = START_OFF * (1 - p);
+      arc.style.strokeDashoffset = offset;
+
+      const label = fmt(START_SECS * (1 - p));
+      timeEl.textContent = label;
+      mbTime.textContent = label;
+
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  })();
 </script>
 
 </body>
