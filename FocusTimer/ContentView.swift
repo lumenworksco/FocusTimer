@@ -32,6 +32,14 @@ struct ContentView: View {
                 Spacer()
 
                 Button {
+                    SocialWindowController.shared.open()
+                } label: {
+                    Image(systemName: "person.2")
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+
+                Button {
                     SettingsWindowController.shared.open(viewModel: vm)
                 } label: {
                     Image(systemName: "gearshape")

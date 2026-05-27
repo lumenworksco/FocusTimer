@@ -14,6 +14,12 @@
 		8A3B5C7D9E1F234560000024 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000014 /* NotificationManager.swift */; };
 		8A3B5C7D9E1F234560000025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000015 /* Assets.xcassets */; };
 		8A3B5C7D9E1F234560000026 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000018 /* SettingsWindowController.swift */; };
+		8A3B5C7D9E1F234560000091 /* SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000081 /* SupabaseConfig.swift */; };
+		8A3B5C7D9E1F234560000092 /* SocialModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000082 /* SocialModels.swift */; };
+		8A3B5C7D9E1F234560000093 /* StatsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000083 /* StatsStore.swift */; };
+		8A3B5C7D9E1F234560000094 /* SupabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000084 /* SupabaseManager.swift */; };
+		8A3B5C7D9E1F234560000095 /* SocialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000085 /* SocialView.swift */; };
+		8A3B5C7D9E1F234560000096 /* SocialWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000086 /* SocialWindowController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +33,12 @@
 		8A3B5C7D9E1F234560000016 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8A3B5C7D9E1F234560000017 /* FocusTimer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FocusTimer.entitlements; sourceTree = "<group>"; };
 		8A3B5C7D9E1F234560000018 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F234560000081 /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F234560000082 /* SocialModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialModels.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F234560000083 /* StatsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsStore.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F234560000084 /* SupabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F234560000085 /* SocialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialView.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F234560000086 /* SocialWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialWindowController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +72,12 @@
 				8A3B5C7D9E1F234560000016 /* Info.plist */,
 				8A3B5C7D9E1F234560000017 /* FocusTimer.entitlements */,
 			8A3B5C7D9E1F234560000018 /* SettingsWindowController.swift */,
+				8A3B5C7D9E1F234560000081 /* SupabaseConfig.swift */,
+				8A3B5C7D9E1F234560000082 /* SocialModels.swift */,
+				8A3B5C7D9E1F234560000083 /* StatsStore.swift */,
+				8A3B5C7D9E1F234560000084 /* SupabaseManager.swift */,
+				8A3B5C7D9E1F234560000085 /* SocialView.swift */,
+				8A3B5C7D9E1F234560000086 /* SocialWindowController.swift */,
 			);
 			path = FocusTimer;
 			sourceTree = "<group>";
@@ -147,6 +165,12 @@
 				8A3B5C7D9E1F234560000023 /* SettingsView.swift in Sources */,
 				8A3B5C7D9E1F234560000024 /* NotificationManager.swift in Sources */,
 				8A3B5C7D9E1F234560000026 /* SettingsWindowController.swift in Sources */,
+				8A3B5C7D9E1F234560000091 /* SupabaseConfig.swift in Sources */,
+				8A3B5C7D9E1F234560000092 /* SocialModels.swift in Sources */,
+				8A3B5C7D9E1F234560000093 /* StatsStore.swift in Sources */,
+				8A3B5C7D9E1F234560000094 /* SupabaseManager.swift in Sources */,
+				8A3B5C7D9E1F234560000095 /* SocialView.swift in Sources */,
+				8A3B5C7D9E1F234560000096 /* SocialWindowController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

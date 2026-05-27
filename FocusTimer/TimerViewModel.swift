@@ -57,6 +57,7 @@ final class TimerViewModel: ObservableObject {
         let duration = (work > 0 ? work : 25) * 60
         timeRemaining = duration
         sessionStartDuration = duration
+        completedPomodoros = StatsStore.shared.todaySessions
     }
 
     var progress: Double {
@@ -114,10 +115,27 @@ final class TimerViewModel: ObservableObject {
 
         if sessionType == .work {
             completedPomodoros += 1
+            StatsStore.shared.recordSession(durationMinutes: workDuration)
+            syncStats()
         }
 
         advance()
         start()
+    }
+
+    private func syncStats() {
+        let sessions = StatsStore.shared.todaySessions
+        let minutes  = StatsStore.shared.todayFocusMinutes
+        let streak   = StatsStore.shared.currentStreak
+        Task {
+            guard SupabaseConfig.isConfigured else { return }
+            try? await SupabaseManager.shared.ensureAuthenticated()
+            try? await SupabaseManager.shared.upsertTodayStats(
+                sessions: sessions,
+                focusMinutes: minutes,
+                streak: streak
+            )
+        }
     }
 
     private func advance() {
