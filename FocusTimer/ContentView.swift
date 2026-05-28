@@ -140,16 +140,29 @@ struct ContentView: View {
             Divider()
 
             // Footer
+            goalFooter
+        }
+        .padding(24)
+        .frame(width: 300)
+        .animation(.easeInOut(duration: 0.35), value: vm.sessionType)
+    }
+
+    private var goalFooter: some View {
+        let done    = vm.completedPomodoros
+        let goal    = vm.dailyGoal
+        let reached = done >= goal
+
+        return VStack(spacing: 6) {
             HStack {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.red)
+                Image(systemName: reached ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(reached ? .green : sessionColor)
                     .font(.caption)
 
-                Text("\(vm.completedPomodoros) completed today")
+                Text(reached ? "Goal reached · \(done) sessions" : "\(done) of \(goal) sessions today")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .contentTransition(.numericText())
-                    .animation(.spring(response: 0.4), value: vm.completedPomodoros)
+                    .animation(.spring(response: 0.4), value: done)
 
                 Spacer()
 
@@ -158,10 +171,25 @@ struct ContentView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.secondary.opacity(0.12))
+                        .frame(height: 3)
+                    Capsule()
+                        .fill(reached ? Color.green : sessionColor)
+                        .frame(
+                            width: goal > 0
+                                ? min(geo.size.width * CGFloat(done) / CGFloat(goal), geo.size.width)
+                                : 0,
+                            height: 3
+                        )
+                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: done)
+                }
+            }
+            .frame(height: 3)
         }
-        .padding(24)
-        .frame(width: 300)
-        .animation(.easeInOut(duration: 0.35), value: vm.sessionType)
     }
 
     private var statusLabel: String {

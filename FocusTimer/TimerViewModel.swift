@@ -37,6 +37,9 @@ final class TimerViewModel: ObservableObject {
     @Published var notificationsEnabled: Bool {
         didSet { UserDefaults.standard.set(notificationsEnabled, forKey: "notificationsEnabled") }
     }
+    @Published var dailyGoal: Int {
+        didSet { UserDefaults.standard.set(dailyGoal, forKey: "dailyGoal") }
+    }
 
     private var timerCancellable: AnyCancellable?
 
@@ -53,6 +56,8 @@ final class TimerViewModel: ObservableObject {
         longBreakDuration = long > 0 ? long : 15
         sessionsBeforeLongBreak = sessions > 0 ? sessions : 4
         notificationsEnabled = ud.object(forKey: "notificationsEnabled") as? Bool ?? true
+        let goal = ud.integer(forKey: "dailyGoal")
+        dailyGoal = goal > 0 ? goal : 8
 
         let duration = (work > 0 ? work : 25) * 60
         timeRemaining = duration

@@ -29,6 +29,10 @@ struct SettingsView: View {
                     Stepper("\(vm.sessionsBeforeLongBreak)", value: $vm.sessionsBeforeLongBreak, in: 2...8)
                 }
                 Divider()
+                settingRow("Daily goal") {
+                    Stepper("\(vm.dailyGoal) sessions", value: $vm.dailyGoal, in: 1...20)
+                }
+                Divider()
                 settingRow("Notifications") {
                     Toggle("", isOn: $vm.notificationsEnabled)
                         .labelsHidden()
