@@ -26,6 +26,7 @@ struct FocusTimerApp: App {
                     .monospacedDigit()
                     .font(.system(size: 13))
             }
+            .foregroundStyle(menuBarColor)
         }
         .menuBarExtraStyle(.window)
     }
@@ -35,5 +36,15 @@ struct FocusTimerApp: App {
             return "pause.fill"
         }
         return viewModel.sessionType.sfSymbol
+    }
+
+    private var menuBarColor: Color {
+        guard viewModel.progress > 0 else { return .primary }
+        let base: Color = switch viewModel.sessionType {
+        case .work:       .red
+        case .shortBreak: .green
+        case .longBreak:  .teal
+        }
+        return viewModel.isRunning ? base : base.opacity(0.5)
     }
 }
