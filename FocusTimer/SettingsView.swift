@@ -33,6 +33,10 @@ struct SettingsView: View {
                     Stepper("\(vm.dailyGoal) sessions", value: $vm.dailyGoal, in: 1...20)
                 }
                 Divider()
+                settingRow("Auto-advance sessions") {
+                    Toggle("", isOn: $vm.autoAdvance).labelsHidden()
+                }
+                Divider()
                 settingRow("Notifications") {
                     Toggle("", isOn: $vm.notificationsEnabled)
                         .labelsHidden()

@@ -40,6 +40,9 @@ final class TimerViewModel: ObservableObject {
     @Published var dailyGoal: Int {
         didSet { UserDefaults.standard.set(dailyGoal, forKey: "dailyGoal") }
     }
+    @Published var autoAdvance: Bool {
+        didSet { UserDefaults.standard.set(autoAdvance, forKey: "autoAdvance") }
+    }
 
     private var timerCancellable: AnyCancellable?
 
@@ -58,6 +61,7 @@ final class TimerViewModel: ObservableObject {
         notificationsEnabled = ud.object(forKey: "notificationsEnabled") as? Bool ?? true
         let goal = ud.integer(forKey: "dailyGoal")
         dailyGoal = goal > 0 ? goal : 8
+        autoAdvance = ud.object(forKey: "autoAdvance") as? Bool ?? true
 
         let duration = (work > 0 ? work : 25) * 60
         timeRemaining = duration
@@ -101,6 +105,7 @@ final class TimerViewModel: ObservableObject {
     func skip() {
         pause()
         advance()
+        if autoAdvance { start() }
     }
 
     private func tick() {
@@ -125,7 +130,7 @@ final class TimerViewModel: ObservableObject {
         }
 
         advance()
-        start()
+        if autoAdvance { start() }
     }
 
     private func syncStats() {
