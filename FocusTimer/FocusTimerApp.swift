@@ -10,6 +10,12 @@ struct FocusTimerApp: App {
     }
 
     var body: some Scene {
+        Window("FocusTimer", id: "main") {
+            MainWindowView()
+                .environmentObject(viewModel)
+        }
+        .windowResizability(.contentSize)
+
         MenuBarExtra {
             ContentView()
                 .environmentObject(viewModel)
@@ -22,7 +28,6 @@ struct FocusTimerApp: App {
             }
         }
         .menuBarExtraStyle(.window)
-
     }
 
     private var menuIcon: String {
