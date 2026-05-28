@@ -9,6 +9,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var popover: NSPopover!
     private var cancellable: AnyCancellable?
 
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return false
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            sender.windows.first { $0.title == "FocusTimer" }?.makeKeyAndOrderFront(nil)
+        }
+        return true
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NotificationManager.shared.requestPermission()
         UpdateChecker.shared.check()
