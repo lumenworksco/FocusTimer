@@ -41,6 +41,18 @@ struct SettingsView: View {
                         }
                 }
             }
+            Divider()
+
+            HStack {
+                Text("Version")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")
+                    .font(.callout.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 2)
         }
         .padding(16)
         .frame(width: 320)

@@ -25,6 +25,7 @@
 		8A3B5C7D9E1F234560000099 /* AutoUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000089 /* AutoUpdater.swift */; };
 		8A3B5C7D9E1F23456000009A /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F23456000008A /* StatsView.swift */; };
 		8A3B5C7D9E1F23456000009B /* StatsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F23456000008B /* StatsWindowController.swift */; };
+		8A3B5C7D9E1F23456000009C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F23456000008C /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 		8A3B5C7D9E1F234560000089 /* AutoUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUpdater.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F23456000008A /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F23456000008B /* StatsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsWindowController.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F23456000008C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +95,7 @@
 				8A3B5C7D9E1F234560000089 /* AutoUpdater.swift */,
 				8A3B5C7D9E1F23456000008A /* StatsView.swift */,
 				8A3B5C7D9E1F23456000008B /* StatsWindowController.swift */,
+				8A3B5C7D9E1F23456000008C /* AppDelegate.swift */,
 			);
 			path = FocusTimer;
 			sourceTree = "<group>";
@@ -191,6 +194,7 @@
 				8A3B5C7D9E1F234560000099 /* AutoUpdater.swift in Sources */,
 				8A3B5C7D9E1F23456000009A /* StatsView.swift in Sources */,
 				8A3B5C7D9E1F23456000009B /* StatsWindowController.swift in Sources */,
+				8A3B5C7D9E1F23456000009C /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
