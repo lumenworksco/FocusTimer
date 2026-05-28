@@ -56,6 +56,22 @@ final class StatsStore {
         return streak
     }
 
+    struct DayStat {
+        let date: Date
+        let sessions: Int
+        let focusMinutes: Int
+        var isToday: Bool { Calendar.current.isDateInToday(date) }
+    }
+
+    func history(days n: Int) -> [DayStat] {
+        let cal = Calendar.current
+        return (0..<n).compactMap { i -> DayStat? in
+            guard let d = cal.date(byAdding: .day, value: -(n - 1 - i), to: Date()) else { return nil }
+            let r = records[key(for: d)] ?? DayRecord()
+            return DayStat(date: d, sessions: r.sessions, focusMinutes: r.focusMinutes)
+        }
+    }
+
     func recordSession(durationMinutes: Int) {
         var record = records[todayKey] ?? DayRecord()
         record.sessions += 1

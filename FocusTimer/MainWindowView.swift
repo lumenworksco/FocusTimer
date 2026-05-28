@@ -59,6 +59,11 @@ struct MainWindowView: View {
                 }
                 .buttonStyle(.plain)
 
+                Button { StatsWindowController.shared.open() } label: {
+                    Image(systemName: "chart.bar").foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+
                 Button { SettingsWindowController.shared.open(viewModel: vm) } label: {
                     Image(systemName: "gearshape").foregroundColor(.secondary)
                 }
