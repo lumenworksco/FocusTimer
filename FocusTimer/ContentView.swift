@@ -2,7 +2,8 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var vm: TimerViewModel
-    @ObservedObject private var updater = UpdateChecker.shared
+    @ObservedObject private var updater  = UpdateChecker.shared
+    @ObservedObject private var updaterW = AutoUpdater.shared
     @State private var glowOpacity: Double = 0.2
 
     private var sessionColor: Color {
@@ -140,21 +141,21 @@ struct ContentView: View {
 
             // Update banner
             if let ver = updater.availableVersion {
-                Button {
-                    NSWorkspace.shared.open(URL(string: "https://github.com/lumenworksco/FocusTimer/releases/latest")!)
-                } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: "arrow.down.circle")
-                        Text("v\(ver) available — download update")
-                    }
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.85))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
-                    .background(Color.blue.opacity(0.75))
-                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                updateBanner(ver)
+            }
+            if case .failed(let msg) = updaterW.phase {
+                HStack(spacing: 4) {
+                    Image(systemName: "exclamationmark.triangle")
+                    Text(msg)
+                    Spacer()
+                    Button("✕") { AutoUpdater.shared.phase = .idle }.font(.caption2.weight(.bold))
                 }
-                .buttonStyle(.plain)
+                .font(.caption2)
+                .foregroundStyle(.white.opacity(0.9))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.red.opacity(0.75))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
             }
 
             Divider()
@@ -209,6 +210,64 @@ struct ContentView: View {
                 }
             }
             .frame(height: 3)
+        }
+    }
+
+    private func updateBanner(_ ver: String) -> some View {
+        Group {
+            switch updaterW.phase {
+            case .idle:
+                Button {
+                    if let url = updater.downloadURL {
+                        AutoUpdater.shared.startUpdate(from: url)
+                    } else {
+                        NSWorkspace.shared.open(URL(string: "https://github.com/lumenworksco/FocusTimer/releases/latest")!)
+                    }
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "arrow.down.circle")
+                        Text("v\(ver) available — Update Now")
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.85))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(Color.blue.opacity(0.75))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                }
+                .buttonStyle(.plain)
+
+            case .downloading(let p):
+                VStack(spacing: 3) {
+                    Text("Downloading… \(Int(p * 100))%")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.85))
+                    GeometryReader { geo in
+                        Capsule().fill(Color.white.opacity(0.35)).frame(height: 3)
+                        Capsule().fill(Color.white).frame(width: geo.size.width * p, height: 3)
+                    }
+                    .frame(height: 3)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.blue.opacity(0.75))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
+
+            case .installing:
+                HStack(spacing: 5) {
+                    ProgressView().controlSize(.mini).colorScheme(.dark)
+                    Text("Installing…")
+                }
+                .font(.caption2)
+                .foregroundStyle(.white.opacity(0.85))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(Color.blue.opacity(0.75))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
+
+            case .failed:
+                EmptyView()
+            }
         }
     }
 

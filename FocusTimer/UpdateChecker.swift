@@ -4,6 +4,7 @@ final class UpdateChecker: ObservableObject {
     static let shared = UpdateChecker()
 
     @Published var availableVersion: String? = nil
+    @Published var downloadURL: String? = nil
 
     private let current: String
     private let apiURL = URL(string: "https://api.github.com/repos/lumenworksco/FocusTimer/releases/latest")!
@@ -20,8 +21,11 @@ final class UpdateChecker: ObservableObject {
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let tag  = json["tag_name"] as? String else { return }
             let remote = tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
-            if isNewer(remote, than: current) {
-                await MainActor.run { availableVersion = remote }
+            guard isNewer(remote, than: current) else { return }
+            let url = (json["assets"] as? [[String: Any]])?.first?["browser_download_url"] as? String
+            await MainActor.run {
+                availableVersion = remote
+                downloadURL = url
             }
         }
     }

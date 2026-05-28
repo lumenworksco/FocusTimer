@@ -2,7 +2,8 @@ import SwiftUI
 
 struct MainWindowView: View {
     @EnvironmentObject var vm: TimerViewModel
-    @ObservedObject private var updater = UpdateChecker.shared
+    @ObservedObject private var updater  = UpdateChecker.shared
+    @ObservedObject private var updaterW = AutoUpdater.shared
     @State private var glowOpacity: Double = 0.0
 
     private var sessionColor: Color {
@@ -27,6 +28,9 @@ struct MainWindowView: View {
         .frame(width: 360)
         .overlay(alignment: .top) {
             if let ver = updater.availableVersion { updateBanner(ver) }
+        }
+        .overlay(alignment: .top) {
+            if case .failed(let msg) = updaterW.phase { errorBanner(msg) }
         }
         .animation(.easeInOut(duration: 0.35), value: vm.sessionType)
     }
@@ -205,20 +209,75 @@ struct MainWindowView: View {
     }
 
     private func updateBanner(_ ver: String) -> some View {
-        Button {
-            NSWorkspace.shared.open(URL(string: "https://github.com/lumenworksco/FocusTimer/releases/latest")!)
-        } label: {
-            HStack(spacing: 5) {
-                Image(systemName: "arrow.down.circle")
-                Text("v\(ver) available — download update")
+        Group {
+            switch updaterW.phase {
+            case .idle:
+                Button {
+                    if let url = updater.downloadURL {
+                        AutoUpdater.shared.startUpdate(from: url)
+                    } else {
+                        NSWorkspace.shared.open(URL(string: "https://github.com/lumenworksco/FocusTimer/releases/latest")!)
+                    }
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "arrow.down.circle")
+                        Text("v\(ver) available — Update Now")
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.85))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(Color.blue.opacity(0.75))
+                }
+                .buttonStyle(.plain)
+
+            case .downloading(let p):
+                VStack(spacing: 0) {
+                    Text("Downloading update… \(Int(p * 100))%")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.85))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 4)
+                    GeometryReader { geo in
+                        Capsule().fill(Color.white.opacity(0.35)).frame(height: 3)
+                        Capsule().fill(Color.white).frame(width: geo.size.width * p, height: 3)
+                    }
+                    .frame(height: 3)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 4)
+                }
+                .background(Color.blue.opacity(0.75))
+
+            case .installing:
+                HStack(spacing: 5) {
+                    ProgressView().controlSize(.mini).colorScheme(.dark)
+                    Text("Installing…")
+                }
+                .font(.caption2)
+                .foregroundStyle(.white.opacity(0.85))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(Color.blue.opacity(0.75))
+
+            case .failed:
+                EmptyView()
             }
-            .font(.caption2)
-            .foregroundStyle(.white.opacity(0.85))
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 6)
-            .background(Color.blue.opacity(0.75))
         }
-        .buttonStyle(.plain)
+    }
+
+    private func errorBanner(_ msg: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: "exclamationmark.triangle")
+            Text(msg)
+            Spacer()
+            Button("Dismiss") { AutoUpdater.shared.phase = .idle }
+                .font(.caption2.weight(.semibold))
+        }
+        .font(.caption2)
+        .foregroundStyle(.white.opacity(0.9))
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color.red.opacity(0.75))
     }
 
     private var statusLabel: String {
