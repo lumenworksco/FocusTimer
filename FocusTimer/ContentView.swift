@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var vm: TimerViewModel
+    @ObservedObject private var updater = UpdateChecker.shared
     @State private var glowOpacity: Double = 0.2
 
     private var sessionColor: Color {
@@ -135,6 +136,25 @@ struct ContentView: View {
 
                 Button("Skip") { vm.skip() }
                     .buttonStyle(.bordered)
+            }
+
+            // Update banner
+            if let ver = updater.availableVersion {
+                Button {
+                    NSWorkspace.shared.open(URL(string: "https://github.com/lumenworksco/FocusTimer/releases/latest")!)
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "arrow.down.circle")
+                        Text("v\(ver) available — download update")
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.85))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(Color.blue.opacity(0.75))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                }
+                .buttonStyle(.plain)
             }
 
             Divider()

@@ -20,6 +20,7 @@
 		8A3B5C7D9E1F234560000094 /* SupabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000084 /* SupabaseManager.swift */; };
 		8A3B5C7D9E1F234560000095 /* SocialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000085 /* SocialView.swift */; };
 		8A3B5C7D9E1F234560000096 /* SocialWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000086 /* SocialWindowController.swift */; };
+		8A3B5C7D9E1F234560000097 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3B5C7D9E1F234560000087 /* UpdateChecker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		8A3B5C7D9E1F234560000084 /* SupabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F234560000085 /* SocialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialView.swift; sourceTree = "<group>"; };
 		8A3B5C7D9E1F234560000086 /* SocialWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialWindowController.swift; sourceTree = "<group>"; };
+		8A3B5C7D9E1F234560000087 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 				8A3B5C7D9E1F234560000084 /* SupabaseManager.swift */,
 				8A3B5C7D9E1F234560000085 /* SocialView.swift */,
 				8A3B5C7D9E1F234560000086 /* SocialWindowController.swift */,
+				8A3B5C7D9E1F234560000087 /* UpdateChecker.swift */,
 			);
 			path = FocusTimer;
 			sourceTree = "<group>";
@@ -171,6 +174,7 @@
 				8A3B5C7D9E1F234560000094 /* SupabaseManager.swift in Sources */,
 				8A3B5C7D9E1F234560000095 /* SocialView.swift in Sources */,
 				8A3B5C7D9E1F234560000096 /* SocialWindowController.swift in Sources */,
+				8A3B5C7D9E1F234560000097 /* UpdateChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

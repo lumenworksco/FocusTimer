@@ -6,6 +6,7 @@ struct FocusTimerApp: App {
 
     init() {
         NotificationManager.shared.requestPermission()
+        UpdateChecker.shared.check()
     }
 
     var body: some Scene {
