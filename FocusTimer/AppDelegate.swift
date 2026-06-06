@@ -85,6 +85,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             popover.performClose(sender)
         } else {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            if let popoverWindow = popover.contentViewController?.view.window {
+                popoverWindow.level = .popUpMenu
+                popoverWindow.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+            }
             popover.contentViewController?.view.window?.makeKey()
         }
     }
