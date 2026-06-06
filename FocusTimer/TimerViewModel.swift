@@ -49,6 +49,9 @@ final class TimerViewModel: ObservableObject {
             if hotkeysEnabled { HotkeyManager.shared.register() } else { HotkeyManager.shared.unregister() }
         }
     }
+    @Published var notificationSound: NotificationSound {
+        didSet { UserDefaults.standard.set(notificationSound.rawValue, forKey: "notificationSound") }
+    }
 
     private var timerCancellable: AnyCancellable?
 
@@ -69,6 +72,8 @@ final class TimerViewModel: ObservableObject {
         dailyGoal = goal > 0 ? goal : 8
         autoAdvance = ud.object(forKey: "autoAdvance") as? Bool ?? true
         hotkeysEnabled = ud.object(forKey: "hotkeysEnabled") as? Bool ?? true
+        let soundRaw = ud.string(forKey: "notificationSound") ?? NotificationSound.systemDefault.rawValue
+        notificationSound = NotificationSound(rawValue: soundRaw) ?? .systemDefault
 
         let duration = (work > 0 ? work : 25) * 60
         timeRemaining = duration
@@ -127,7 +132,8 @@ final class TimerViewModel: ObservableObject {
         pause()
 
         if notificationsEnabled {
-            NotificationManager.shared.notify(sessionEnded: sessionType)
+            notificationSound.playAtSessionEnd()
+            NotificationManager.shared.notify(sessionEnded: sessionType, sound: notificationSound.unSound)
         }
 
         if sessionType == .work {

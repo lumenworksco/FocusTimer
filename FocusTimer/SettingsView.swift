@@ -44,6 +44,27 @@ struct SettingsView: View {
                             if enabled { NotificationManager.shared.requestPermission() }
                         }
                 }
+                if vm.notificationsEnabled {
+                    Divider()
+                    settingRow("Sound") {
+                        HStack(spacing: 6) {
+                            Button { vm.notificationSound.preview() } label: {
+                                Image(systemName: "speaker.wave.2")
+                                    .foregroundStyle(vm.notificationSound.canPreview ? .secondary : .tertiary)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!vm.notificationSound.canPreview)
+
+                            Picker("", selection: $vm.notificationSound) {
+                                ForEach(NotificationSound.allCases, id: \.self) {
+                                    Text($0.rawValue).tag($0)
+                                }
+                            }
+                            .labelsHidden()
+                            .frame(width: 90)
+                        }
+                    }
+                }
             }
             sectionLabel("Shortcuts", icon: "keyboard")
 
