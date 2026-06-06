@@ -45,6 +45,30 @@ struct SettingsView: View {
                         }
                 }
             }
+            sectionLabel("Shortcuts", icon: "keyboard")
+
+            card {
+                settingRow("Global shortcuts") {
+                    Toggle("", isOn: $vm.hotkeysEnabled).labelsHidden()
+                }
+                if vm.hotkeysEnabled {
+                    Divider()
+                    HStack(spacing: 8) {
+                        shortcutBadge("⌃⌥Space")
+                        Text("Start / Pause")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        shortcutBadge("⌃⌥S")
+                        Text("Skip")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 14)
+                    .frame(height: 38)
+                }
+            }
+
             Divider()
 
             HStack {
@@ -76,6 +100,16 @@ struct SettingsView: View {
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.07), lineWidth: 1))
+    }
+
+    private func shortcutBadge(_ text: String) -> some View {
+        Text(text)
+            .font(.caption.monospaced())
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(Color(NSColor.controlColor))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.white.opacity(0.1), lineWidth: 1))
     }
 
     private func settingRow<T: View>(_ label: String, @ViewBuilder trailing: () -> T) -> some View {

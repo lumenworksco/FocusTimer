@@ -43,6 +43,12 @@ final class TimerViewModel: ObservableObject {
     @Published var autoAdvance: Bool {
         didSet { UserDefaults.standard.set(autoAdvance, forKey: "autoAdvance") }
     }
+    @Published var hotkeysEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(hotkeysEnabled, forKey: "hotkeysEnabled")
+            if hotkeysEnabled { HotkeyManager.shared.register() } else { HotkeyManager.shared.unregister() }
+        }
+    }
 
     private var timerCancellable: AnyCancellable?
 
@@ -62,6 +68,7 @@ final class TimerViewModel: ObservableObject {
         let goal = ud.integer(forKey: "dailyGoal")
         dailyGoal = goal > 0 ? goal : 8
         autoAdvance = ud.object(forKey: "autoAdvance") as? Bool ?? true
+        hotkeysEnabled = ud.object(forKey: "hotkeysEnabled") as? Bool ?? true
 
         let duration = (work > 0 ? work : 25) * 60
         timeRemaining = duration

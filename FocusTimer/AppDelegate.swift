@@ -36,6 +36,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             rootView: ContentView().environmentObject(viewModel)
         )
 
+        HotkeyManager.shared.onToggle = { [weak self] in self?.viewModel.toggleTimer() }
+        HotkeyManager.shared.onSkip   = { [weak self] in self?.viewModel.skip() }
+        if viewModel.hotkeysEnabled { HotkeyManager.shared.register() }
+
         cancellable = viewModel.objectWillChange
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
