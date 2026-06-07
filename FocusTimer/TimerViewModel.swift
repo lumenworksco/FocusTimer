@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import ServiceManagement
 
 enum SessionType: String, CaseIterable {
     case work = "Work"
@@ -52,6 +53,12 @@ final class TimerViewModel: ObservableObject {
     @Published var notificationSound: NotificationSound {
         didSet { UserDefaults.standard.set(notificationSound.rawValue, forKey: "notificationSound") }
     }
+    @Published var launchAtLogin: Bool {
+        didSet {
+            if launchAtLogin { try? SMAppService.mainApp.register() }
+            else             { try? SMAppService.mainApp.unregister() }
+        }
+    }
 
     private var timerCancellable: AnyCancellable?
 
@@ -74,6 +81,7 @@ final class TimerViewModel: ObservableObject {
         hotkeysEnabled = ud.object(forKey: "hotkeysEnabled") as? Bool ?? true
         let soundRaw = ud.string(forKey: "notificationSound") ?? NotificationSound.systemDefault.rawValue
         notificationSound = NotificationSound(rawValue: soundRaw) ?? .systemDefault
+        launchAtLogin = SMAppService.mainApp.status == .enabled
 
         let duration = (work > 0 ? work : 25) * 60
         timeRemaining = duration

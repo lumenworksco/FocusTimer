@@ -25,6 +25,10 @@ struct SettingsView: View {
             sectionLabel("Behavior", icon: "gearshape")
 
             card {
+                settingRow("Launch at Login") {
+                    Toggle("", isOn: $vm.launchAtLogin).labelsHidden()
+                }
+                Divider()
                 settingRow("Sessions before long break") {
                     Stepper("\(vm.sessionsBeforeLongBreak)", value: $vm.sessionsBeforeLongBreak, in: 2...8)
                 }
