@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import CoreGraphics
 import ServiceManagement
 
 enum SessionType: String, CaseIterable {
@@ -59,8 +60,20 @@ final class TimerViewModel: ObservableObject {
             else             { try? SMAppService.mainApp.unregister() }
         }
     }
+    @Published var idleDetectionEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(idleDetectionEnabled, forKey: "idleDetectionEnabled")
+            if idleDetectionEnabled { if isRunning { startIdleMonitor() } }
+            else { stopIdleMonitor() }
+        }
+    }
+    @Published var idlePauseThreshold: Int {
+        didSet { UserDefaults.standard.set(idlePauseThreshold, forKey: "idlePauseThreshold") }
+    }
 
     private var timerCancellable: AnyCancellable?
+    private var idleMonitorCancellable: AnyCancellable?
+    private var pausedDueToIdle = false
 
     init() {
         let ud = UserDefaults.standard
@@ -82,6 +95,9 @@ final class TimerViewModel: ObservableObject {
         let soundRaw = ud.string(forKey: "notificationSound") ?? NotificationSound.systemDefault.rawValue
         notificationSound = NotificationSound(rawValue: soundRaw) ?? .systemDefault
         launchAtLogin = SMAppService.mainApp.status == .enabled
+        idleDetectionEnabled = ud.object(forKey: "idleDetectionEnabled") as? Bool ?? true
+        let idleThresh = ud.integer(forKey: "idlePauseThreshold")
+        idlePauseThreshold = idleThresh > 0 ? idleThresh : 5
 
         let duration = (work > 0 ? work : 25) * 60
         timeRemaining = duration
@@ -103,16 +119,52 @@ final class TimerViewModel: ObservableObject {
     }
 
     func start() {
+        pausedDueToIdle = false
         isRunning = true
         timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.tick() }
+        if idleDetectionEnabled { startIdleMonitor() }
     }
 
     func pause() {
         isRunning = false
         timerCancellable?.cancel()
         timerCancellable = nil
+        stopIdleMonitor()
+    }
+
+    private func pauseForIdle() {
+        isRunning = false
+        timerCancellable?.cancel()
+        timerCancellable = nil
+        // Idle monitor stays running to detect when user returns
+    }
+
+    private func startIdleMonitor() {
+        idleMonitorCancellable?.cancel()
+        idleMonitorCancellable = Timer.publish(every: 5, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in self?.checkIdle() }
+    }
+
+    private func stopIdleMonitor() {
+        idleMonitorCancellable?.cancel()
+        idleMonitorCancellable = nil
+        pausedDueToIdle = false
+    }
+
+    private func checkIdle() {
+        let mouseIdle = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .mouseMoved)
+        let keyIdle   = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .keyDown)
+        let idleSecs  = min(mouseIdle, keyIdle)
+
+        if pausedDueToIdle {
+            if idleSecs < 5.0 { start() } // user returned — auto-resume
+        } else if isRunning, idleSecs >= Double(idlePauseThreshold * 60) {
+            pausedDueToIdle = true
+            pauseForIdle()
+        }
     }
 
     func reset() {

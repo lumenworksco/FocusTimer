@@ -41,6 +41,16 @@ struct SettingsView: View {
                     Toggle("", isOn: $vm.autoAdvance).labelsHidden()
                 }
                 Divider()
+                settingRow("Pause when idle") {
+                    Toggle("", isOn: $vm.idleDetectionEnabled).labelsHidden()
+                }
+                if vm.idleDetectionEnabled {
+                    Divider()
+                    settingRow("Idle threshold") {
+                        Stepper("\(vm.idlePauseThreshold) min", value: $vm.idlePauseThreshold, in: 2...30)
+                    }
+                }
+                Divider()
                 settingRow("Notifications") {
                     Toggle("", isOn: $vm.notificationsEnabled)
                         .labelsHidden()
