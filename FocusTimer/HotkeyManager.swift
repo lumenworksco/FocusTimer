@@ -29,25 +29,17 @@ final class HotkeyManager {
         let ptr = Unmanaged.passUnretained(self).toOpaque()
         InstallEventHandler(GetApplicationEventTarget(), carbonHotKeyHandler, 1, &spec, ptr, &eventHandlerRef)
 
+        let ud = UserDefaults.standard
+        let toggleCode = UInt32(ud.object(forKey: "toggleHotkeyCode") as? Int ?? Int(kVK_Space))
+        let toggleMods = UInt32(ud.object(forKey: "toggleHotkeyMods") as? Int ?? Int(controlKey | optionKey))
+        let skipCode   = UInt32(ud.object(forKey: "skipHotkeyCode")   as? Int ?? Int(kVK_ANSI_S))
+        let skipMods   = UInt32(ud.object(forKey: "skipHotkeyMods")   as? Int ?? Int(controlKey | optionKey))
+
         let id1 = EventHotKeyID(signature: HotkeyManager.signature, id: 1)
-        RegisterEventHotKey(
-            UInt32(kVK_Space),
-            UInt32(controlKey | optionKey),
-            id1,
-            GetApplicationEventTarget(),
-            0,
-            &toggleHotKeyRef
-        )
+        RegisterEventHotKey(toggleCode, toggleMods, id1, GetApplicationEventTarget(), 0, &toggleHotKeyRef)
 
         let id2 = EventHotKeyID(signature: HotkeyManager.signature, id: 2)
-        RegisterEventHotKey(
-            UInt32(kVK_ANSI_S),
-            UInt32(controlKey | optionKey),
-            id2,
-            GetApplicationEventTarget(),
-            0,
-            &skipHotKeyRef
-        )
+        RegisterEventHotKey(skipCode, skipMods, id2, GetApplicationEventTarget(), 0, &skipHotKeyRef)
     }
 
     func unregister() {

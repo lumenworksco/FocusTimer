@@ -70,6 +70,8 @@ final class TimerViewModel: ObservableObject {
     @Published var idlePauseThreshold: Int {
         didSet { UserDefaults.standard.set(idlePauseThreshold, forKey: "idlePauseThreshold") }
     }
+    @Published var toggleHotkeyLabel: String
+    @Published var skipHotkeyLabel: String
 
     private var timerCancellable: AnyCancellable?
     private var idleMonitorCancellable: AnyCancellable?
@@ -98,11 +100,43 @@ final class TimerViewModel: ObservableObject {
         idleDetectionEnabled = ud.object(forKey: "idleDetectionEnabled") as? Bool ?? true
         let idleThresh = ud.integer(forKey: "idlePauseThreshold")
         idlePauseThreshold = idleThresh > 0 ? idleThresh : 5
+        toggleHotkeyLabel = ud.string(forKey: "toggleHotkeyLabel") ?? "⌃⌥Space"
+        skipHotkeyLabel   = ud.string(forKey: "skipHotkeyLabel")   ?? "⌃⌥S"
 
         let duration = (work > 0 ? work : 25) * 60
         timeRemaining = duration
         sessionStartDuration = duration
         completedPomodoros = StatsStore.shared.todaySessions
+    }
+
+    func updateToggleHotkey(code: Int, mods: Int, label: String) {
+        let ud = UserDefaults.standard
+        let skipCode = ud.object(forKey: "skipHotkeyCode") as? Int ?? 1
+        let skipMods = ud.object(forKey: "skipHotkeyMods") as? Int ?? 6144
+        guard code != skipCode || mods != skipMods else {
+            if hotkeysEnabled { HotkeyManager.shared.register() }
+            return
+        }
+        ud.set(code, forKey: "toggleHotkeyCode")
+        ud.set(mods, forKey: "toggleHotkeyMods")
+        ud.set(label, forKey: "toggleHotkeyLabel")
+        toggleHotkeyLabel = label
+        if hotkeysEnabled { HotkeyManager.shared.register() }
+    }
+
+    func updateSkipHotkey(code: Int, mods: Int, label: String) {
+        let ud = UserDefaults.standard
+        let toggleCode = ud.object(forKey: "toggleHotkeyCode") as? Int ?? 49
+        let toggleMods = ud.object(forKey: "toggleHotkeyMods") as? Int ?? 6144
+        guard code != toggleCode || mods != toggleMods else {
+            if hotkeysEnabled { HotkeyManager.shared.register() }
+            return
+        }
+        ud.set(code, forKey: "skipHotkeyCode")
+        ud.set(mods, forKey: "skipHotkeyMods")
+        ud.set(label, forKey: "skipHotkeyLabel")
+        skipHotkeyLabel = label
+        if hotkeysEnabled { HotkeyManager.shared.register() }
     }
 
     var progress: Double {
