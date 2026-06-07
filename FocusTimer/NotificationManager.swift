@@ -48,13 +48,15 @@ final class NotificationManager {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 
-    func notify(sessionEnded type: SessionType, sound: UNNotificationSound?) {
+    func notify(sessionEnded type: SessionType, sound: UNNotificationSound?, taskLabel: String = "") {
         let content = UNMutableNotificationContent()
 
         switch type {
         case .work:
             content.title = "Work session complete!"
-            content.body = "Time to take a break. Great focus session."
+            content.body  = taskLabel.isEmpty
+                ? "Time to take a break. Great focus session."
+                : "\(taskLabel) — take a well-earned break."
         case .shortBreak:
             content.title = "Break over!"
             content.body = "Ready to get back to it?"

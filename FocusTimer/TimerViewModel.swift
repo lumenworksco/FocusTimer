@@ -72,6 +72,9 @@ final class TimerViewModel: ObservableObject {
     }
     @Published var toggleHotkeyLabel: String
     @Published var skipHotkeyLabel: String
+    @Published var taskLabel: String {
+        didSet { UserDefaults.standard.set(taskLabel, forKey: "taskLabel") }
+    }
 
     private var timerCancellable: AnyCancellable?
     private var idleMonitorCancellable: AnyCancellable?
@@ -102,6 +105,7 @@ final class TimerViewModel: ObservableObject {
         idlePauseThreshold = idleThresh > 0 ? idleThresh : 5
         toggleHotkeyLabel = ud.string(forKey: "toggleHotkeyLabel") ?? "⌃⌥Space"
         skipHotkeyLabel   = ud.string(forKey: "skipHotkeyLabel")   ?? "⌃⌥S"
+        taskLabel         = ud.string(forKey: "taskLabel")         ?? ""
 
         let duration = (work > 0 ? work : 25) * 60
         timeRemaining = duration
@@ -227,7 +231,7 @@ final class TimerViewModel: ObservableObject {
 
         if notificationsEnabled {
             notificationSound.playAtSessionEnd()
-            NotificationManager.shared.notify(sessionEnded: sessionType, sound: notificationSound.unSound)
+            NotificationManager.shared.notify(sessionEnded: sessionType, sound: notificationSound.unSound, taskLabel: taskLabel)
         }
 
         if sessionType == .work {

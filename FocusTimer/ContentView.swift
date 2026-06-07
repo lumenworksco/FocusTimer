@@ -58,6 +58,15 @@ struct ContentView: View {
                 .buttonStyle(.plain)
             }
 
+            // Task label
+            TextField("What are you working on?", text: $vm.taskLabel)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .textFieldStyle(.plain)
+                .lineLimit(1)
+                .truncationMode(.tail)
+
             // Progress ring
             ZStack {
                 // Track
