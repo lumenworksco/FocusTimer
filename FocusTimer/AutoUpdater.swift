@@ -72,6 +72,7 @@ final class AutoUpdater: ObservableObject {
         do {
             if fm.fileExists(atPath: dst.path) { try fm.removeItem(at: dst) }
             try fm.copyItem(at: src, to: dst)
+            _ = run("/usr/bin/xattr", ["-cr", dst.path])
         } catch {
             _ = run("/usr/bin/hdiutil", ["detach", mountPoint.path, "-force"])
             phase = .failed("Could not replace app — try dragging manually")
