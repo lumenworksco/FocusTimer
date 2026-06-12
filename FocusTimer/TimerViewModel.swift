@@ -73,6 +73,12 @@ final class TimerViewModel: ObservableObject {
     @Published var idlePauseThreshold: Int {
         didSet { UserDefaults.standard.set(idlePauseThreshold, forKey: "idlePauseThreshold") }
     }
+    @Published var weeklyDigestEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(weeklyDigestEnabled, forKey: "weeklyDigestEnabled")
+            if weeklyDigestEnabled { DigestChecker.shared.start() } else { DigestChecker.shared.stop() }
+        }
+    }
     @Published var toggleHotkeyLabel: String
     @Published var skipHotkeyLabel: String
     @Published var taskLabel: String {
@@ -107,6 +113,7 @@ final class TimerViewModel: ObservableObject {
         idleDetectionEnabled = ud.object(forKey: "idleDetectionEnabled") as? Bool ?? true
         let idleThresh = ud.integer(forKey: "idlePauseThreshold")
         idlePauseThreshold = idleThresh > 0 ? idleThresh : 5
+        weeklyDigestEnabled = ud.object(forKey: "weeklyDigestEnabled") as? Bool ?? true
         toggleHotkeyLabel = ud.string(forKey: "toggleHotkeyLabel") ?? "⌃⌥Space"
         skipHotkeyLabel   = ud.string(forKey: "skipHotkeyLabel")   ?? "⌃⌥S"
         taskLabel         = ud.string(forKey: "taskLabel")         ?? ""

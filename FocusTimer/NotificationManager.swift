@@ -75,4 +75,25 @@ final class NotificationManager {
 
         UNUserNotificationCenter.current().add(request)
     }
+
+    func sendWeeklyDigest(sessions: Int, minutes: Int, streak: Int) {
+        let content = UNMutableNotificationContent()
+        content.title = "Weekly focus summary"
+        if sessions == 0 {
+            content.body = "No sessions this week — ready to start fresh?"
+        } else {
+            var parts: [String] = ["\(sessions) session\(sessions == 1 ? "" : "s")"]
+            if minutes >= 60 {
+                let h = minutes / 60, m = minutes % 60
+                parts.append(m == 0 ? "\(h)h" : "\(h)h \(m)m")
+            } else if minutes > 0 {
+                parts.append("\(minutes)m")
+            }
+            if streak > 1 { parts.append("\(streak)-day streak") }
+            content.body = parts.joined(separator: " · ")
+        }
+        content.sound = .default
+        let request = UNNotificationRequest(identifier: "weekly-digest-\(UUID())", content: content, trigger: nil)
+        UNUserNotificationCenter.current().add(request)
+    }
 }

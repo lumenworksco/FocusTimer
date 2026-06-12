@@ -65,6 +65,10 @@ struct SettingsView: View {
                 }
                 if vm.notificationsEnabled {
                     Divider()
+                    settingRow("Weekly digest") {
+                        Toggle("", isOn: $vm.weeklyDigestEnabled).labelsHidden()
+                    }
+                    Divider()
                     settingRow("Sound") {
                         HStack(spacing: 6) {
                             Button { vm.notificationSound.preview() } label: {
