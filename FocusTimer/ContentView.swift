@@ -5,7 +5,21 @@ struct ContentView: View {
     @ObservedObject private var updater  = UpdateChecker.shared
     @ObservedObject private var updaterW = AutoUpdater.shared
     @State private var glowOpacity: Double = 0.2
+    @State private var breakPrompt: String = ""
     @FocusState private var isTaskFieldFocused: Bool
+
+    private static let breakPrompts = [
+        "Stand up and stretch for a minute.",
+        "Get some water.",
+        "Look out a window — give your eyes a rest.",
+        "Take 5 slow, deep breaths.",
+        "Roll your shoulders back and relax your jaw.",
+        "Walk to another room and back.",
+        "Close your eyes and rest for 30 seconds.",
+        "Do a quick neck stretch — left, right, forward.",
+        "Step outside if you can — even for 60 seconds.",
+        "Refill your coffee or tea.",
+    ]
 
     private var sessionColor: Color {
         switch vm.sessionType {
@@ -142,6 +156,15 @@ struct ContentView: View {
                 }
             }
 
+            // Break prompt
+            if vm.sessionType != .work, !breakPrompt.isEmpty {
+                Text(breakPrompt)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+
             // Controls
             HStack(spacing: 14) {
                 Button("Reset") { vm.reset() }
@@ -191,6 +214,16 @@ struct ContentView: View {
         .padding(24)
         .frame(width: 300)
         .animation(.easeInOut(duration: 0.35), value: vm.sessionType)
+        .onAppear {
+            if vm.sessionType != .work {
+                breakPrompt = ContentView.breakPrompts.randomElement() ?? ""
+            }
+        }
+        .onChange(of: vm.sessionType) { type in
+            if type != .work {
+                breakPrompt = ContentView.breakPrompts.randomElement() ?? ""
+            }
+        }
     }
 
     // MARK: - Autocomplete
