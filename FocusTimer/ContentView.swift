@@ -370,7 +370,11 @@ struct ContentView: View {
     }
 
     private var statusLabel: String {
-        if vm.isRunning { return "in progress" }
+        if vm.isRunning {
+            return vm.taskLabel.trimmingCharacters(in: .whitespaces) == "🍅"
+                ? "🍅 in progress"
+                : "in progress"
+        }
         if vm.progress > 0 { return "paused" }
         return "ready"
     }

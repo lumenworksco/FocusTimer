@@ -54,9 +54,13 @@ final class NotificationManager {
         switch type {
         case .work:
             content.title = "Work session complete!"
-            content.body  = taskLabel.isEmpty
-                ? "Time to take a break. Great focus session."
-                : "\(taskLabel) — take a well-earned break."
+            if taskLabel.trimmingCharacters(in: .whitespaces) == "🍅" {
+                content.body = "Pomodoro complete! 🍅 Take a well-earned break."
+            } else {
+                content.body = taskLabel.isEmpty
+                    ? "Time to take a break. Great focus session."
+                    : "\(taskLabel) — take a well-earned break."
+            }
         case .shortBreak:
             content.title = "Break over!"
             content.body = "Ready to get back to it?"

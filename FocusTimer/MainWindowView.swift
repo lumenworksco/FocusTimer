@@ -5,6 +5,21 @@ struct MainWindowView: View {
     @ObservedObject private var updater  = UpdateChecker.shared
     @ObservedObject private var updaterW = AutoUpdater.shared
     @State private var glowOpacity: Double = 0.0
+    @State private var breakPrompt: String = ""
+    @FocusState private var isTaskFieldFocused: Bool
+
+    private static let breakPrompts = [
+        "Stand up and stretch for a minute.",
+        "Get some water.",
+        "Look out a window — give your eyes a rest.",
+        "Take 5 slow, deep breaths.",
+        "Roll your shoulders back and relax your jaw.",
+        "Walk to another room and back.",
+        "Close your eyes and rest for 30 seconds.",
+        "Do a quick neck stretch — left, right, forward.",
+        "Step outside if you can — even for 60 seconds.",
+        "Refill your coffee or tea.",
+    ]
 
     private var sessionColor: Color {
         switch vm.sessionType {
@@ -17,8 +32,16 @@ struct MainWindowView: View {
     var body: some View {
         VStack(spacing: 24) {
             headerRow
+            taskRow
             ringView
             dotsRow
+            if vm.sessionType != .work, !breakPrompt.isEmpty {
+                Text(breakPrompt)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
             controlsRow
             Divider()
             statsRow
@@ -33,9 +56,19 @@ struct MainWindowView: View {
             if case .failed(let msg) = updaterW.phase { errorBanner(msg) }
         }
         .animation(.easeInOut(duration: 0.35), value: vm.sessionType)
+        .onAppear {
+            if vm.sessionType != .work {
+                breakPrompt = MainWindowView.breakPrompts.randomElement() ?? ""
+            }
+        }
+        .onChange(of: vm.sessionType) { type in
+            if type != .work {
+                breakPrompt = MainWindowView.breakPrompts.randomElement() ?? ""
+            }
+        }
     }
 
-    // MARK: - Subviews
+    // MARK: - Header
 
     private var headerRow: some View {
         HStack {
@@ -71,6 +104,65 @@ struct MainWindowView: View {
             }
         }
     }
+
+    // MARK: - Task label
+
+    private var taskRow: some View {
+        VStack(spacing: 4) {
+            TextField("What are you working on?", text: $vm.taskLabel)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .textFieldStyle(.plain)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .focused($isTaskFieldFocused)
+
+            if isTaskFieldFocused && !filteredSuggestions.isEmpty {
+                taskSuggestionsView
+            }
+        }
+    }
+
+    private var filteredSuggestions: [String] {
+        let all = StatsStore.shared.recentLabels(limit: 8)
+        let q = vm.taskLabel.trimmingCharacters(in: .whitespaces)
+        if q.isEmpty { return all }
+        return all.filter { $0.localizedCaseInsensitiveContains(q) && $0.lowercased() != q.lowercased() }
+    }
+
+    private var taskSuggestionsView: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(filteredSuggestions.prefix(5).enumerated()), id: \.element) { idx, label in
+                if idx > 0 { Divider() }
+                Button {
+                    vm.taskLabel = label
+                    isTaskFieldFocused = false
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 9))
+                            .foregroundStyle(.tertiary)
+                        Text(label)
+                            .font(.caption)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 10)
+                    .frame(height: 26)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .background(Color(NSColor.controlBackgroundColor))
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 7))
+        .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .shadow(color: .black.opacity(0.12), radius: 3, y: 2)
+    }
+
+    // MARK: - Ring
 
     private var ringView: some View {
         ZStack {
@@ -119,6 +211,8 @@ struct MainWindowView: View {
         }
     }
 
+    // MARK: - Dots
+
     private var dotsRow: some View {
         HStack(spacing: 12) {
             ForEach(0..<vm.sessionsBeforeLongBreak, id: \.self) { i in
@@ -131,6 +225,8 @@ struct MainWindowView: View {
             }
         }
     }
+
+    // MARK: - Controls
 
     private var controlsRow: some View {
         HStack(spacing: 16) {
@@ -156,6 +252,8 @@ struct MainWindowView: View {
         }
     }
 
+    // MARK: - Stats
+
     private var statsRow: some View {
         HStack {
             statItem("\(vm.completedPomodoros)", "sessions")
@@ -179,6 +277,8 @@ struct MainWindowView: View {
         }
         .frame(maxWidth: .infinity)
     }
+
+    // MARK: - Goal
 
     private var goalRow: some View {
         let done    = vm.completedPomodoros
@@ -212,6 +312,8 @@ struct MainWindowView: View {
             .frame(height: 3)
         }
     }
+
+    // MARK: - Banners
 
     private func updateBanner(_ ver: String) -> some View {
         Group {
@@ -285,8 +387,15 @@ struct MainWindowView: View {
         .background(Color.red.opacity(0.75))
     }
 
+    // MARK: - Helpers
+
     private var statusLabel: String {
-        if vm.isRunning { return "in progress" }
+        if vm.isRunning {
+            // 🍅 easter egg: name your session "🍅" to honour the technique's Italian roots
+            return vm.taskLabel.trimmingCharacters(in: .whitespaces) == "🍅"
+                ? "🍅 in progress"
+                : "in progress"
+        }
         if vm.progress > 0 { return "paused" }
         return "ready"
     }

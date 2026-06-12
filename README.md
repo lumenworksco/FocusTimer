@@ -9,16 +9,6 @@
 
 ---
 
-## Features
-
-- **Menu bar native** — always one click away, never clutters your dock
-- **Animated progress ring** — smooth arc with a pulsing glow while your session runs
-- **Auto-advance** — transitions automatically from work → break → work
-- **Pomodoro dots** — track completed sessions in the current cycle
-- **Fully customizable** — adjust work, short break, and long break durations
-- **macOS notifications** — get alerted when each session completes
-- **Zero accounts, zero tracking** — everything stored locally
-
 ## Download
 
 <div align="center">
@@ -35,62 +25,110 @@
 <br/>
 
 1. Download **FocusTimer.dmg** from the [latest release](https://github.com/lumenworksco/FocusTimer/releases/latest)
-2. Open it and drag `FocusTimer.app` into the **Applications** folder
+2. Open the DMG and drag `FocusTimer.app` to **Applications**
 3. Launch it — the `⏱` icon appears in your menu bar
 
 > **First launch:** macOS may show a security prompt. Go to **System Settings → Privacy & Security** and click **Open Anyway**.
 
-### Build from Source
+---
 
-```bash
-# Clone
-git clone https://github.com/lumenworksco/FocusTimer.git
-cd FocusTimer
+## Features
 
-# Build (requires Xcode 15+)
-xcodebuild -scheme FocusTimer -configuration Release \
-  CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+### Timer
+- **Menu bar native** — one click away, never clutters the Dock
+- **Animated progress ring** — smooth arc with a pulsing glow while your session runs
+- **Session types** — Work, Short Break, and Long Break with distinct colors
+- **Pomodoro dots** — track completed sessions in the current cycle at a glance
+- **Auto-advance** — transitions automatically work → break → work
+- **Idle detection** — auto-pauses when you step away, auto-resumes when you return
 
-# The built app is at:
-# ~/Library/Developer/Xcode/DerivedData/FocusTimer-.../Build/Products/Release/FocusTimer.app
-```
+### Task management
+- **Task label** — name what you're working on; shows next to the timer in the menu bar
+- **Task autocomplete** — recent labels appear as suggestions when you click the field
+- **Session log** — every session recorded with task label, time, and duration
 
-Or open `FocusTimer.xcodeproj` in Xcode and press **⌘R**.
+### Stats & insights
+- **Activity heatmap** — 16-week GitHub-style day grid showing your focus history
+- **Daily bar chart** — sessions or focus time over 1, 2, or 4 weeks
+- **Time-of-day patterns** — hourly distribution chart revealing your peak focus hours
+- **Streak tracking** — current focus streak shown in the main window and Stats
+- **Daily goal** — set a session target; a progress bar tracks you toward it
+
+### Notifications
+- **Session alerts** — notification with optional sound when each session completes
+- **Weekly digest** — Sunday evening summary of sessions, focus time, and streak
+- **Milestone celebrations** — one-time notifications at 10, 50, 100, 500, and 1,000 sessions
+
+### Comfort
+- **Break prompts** — a rotating micro-action suggestion on every break (stand up, breathe, etc.)
+- **Global hotkeys** — customizable keyboard shortcuts to start/pause and skip from anywhere
+- **Launch at login** — start automatically with macOS
+- **Auto-update** — checks for new releases and updates in-app with a single click
+
+---
 
 ## Usage
 
 | Action | How |
 |--------|-----|
-| Open timer | Click `⏱ 25:00` in the menu bar |
-| Start / Pause | Click **Start** or **Pause** in the popup |
-| Skip session | Click **Skip** |
+| Open timer | Click the `⏱` icon in the menu bar |
+| Start / Pause | Click **Start** or press the global hotkey (default `⌃⌥Space`) |
+| Skip session | Click **Skip** or press `⌃⌥S` |
 | Reset session | Click **Reset** |
-| Change durations | Click the ⚙️ gear icon |
+| Open full window | Click the app icon in the Dock |
+| View stats | Click the chart icon `⊞` in the popover header |
+| Settings | Click the gear icon `⚙` or right-click the menu bar icon |
 
-Sessions follow the classic Pomodoro cycle:
+The classic Pomodoro cycle:  
 `Work → Short Break → Work → Short Break → Work → Short Break → Work → Long Break → repeat`
 
-## Customization
+---
 
-Click the **⚙️ gear icon** to open Settings:
+## Settings
 
-| Setting | Default | Range |
-|---------|---------|-------|
-| Work session | 25 min | 1–90 min |
-| Short break | 5 min | 1–30 min |
-| Long break | 15 min | 5–60 min |
-| Sessions before long break | 4 | 2–8 |
-| Notifications | On | — |
+| Setting | Default |
+|---------|---------|
+| Work session | 25 min |
+| Short break | 5 min |
+| Long break | 15 min |
+| Sessions before long break | 4 |
+| Daily goal | 8 sessions |
+| Auto-advance | On |
+| Show task label in menu bar | Off |
+| Pause when idle | On (5 min threshold) |
+| Global hotkeys | On |
+| Notifications | On |
+| Weekly digest | On |
+| Launch at login | Off |
+
+---
+
+## Building from Source
+
+**Requirements:** Xcode 15+, macOS 13.0+
+
+```bash
+git clone https://github.com/lumenworksco/FocusTimer.git
+cd FocusTimer
+
+xcodebuild -scheme FocusTimer -configuration Release \
+  CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+```
+
+Or open `FocusTimer.xcodeproj` in Xcode and press **⌘R**.
+
+---
 
 ## Contributing
 
-Pull requests are welcome! For major changes, please open an issue first.
+Pull requests are welcome. For significant changes please open an issue first to discuss the approach.
 
 1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes (`git commit -m 'Add my feature'`)
-4. Push to the branch (`git push origin feature/my-feature`)
-5. Open a Pull Request
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Commit your changes
+4. Push and open a Pull Request
+
+---
 
 ## License
 
