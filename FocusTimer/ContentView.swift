@@ -5,6 +5,7 @@ struct ContentView: View {
     @ObservedObject private var updater  = UpdateChecker.shared
     @ObservedObject private var updaterW = AutoUpdater.shared
     @State private var glowOpacity: Double = 0.2
+    @FocusState private var isTaskFieldFocused: Bool
 
     private var sessionColor: Color {
         switch vm.sessionType {
@@ -58,14 +59,21 @@ struct ContentView: View {
                 .buttonStyle(.plain)
             }
 
-            // Task label
-            TextField("What are you working on?", text: $vm.taskLabel)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .textFieldStyle(.plain)
-                .lineLimit(1)
-                .truncationMode(.tail)
+            // Task label + autocomplete
+            VStack(spacing: 4) {
+                TextField("What are you working on?", text: $vm.taskLabel)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .textFieldStyle(.plain)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .focused($isTaskFieldFocused)
+
+                if isTaskFieldFocused && !filteredSuggestions.isEmpty {
+                    taskSuggestionsView
+                }
+            }
 
             // Progress ring
             ZStack {
@@ -183,6 +191,46 @@ struct ContentView: View {
         .padding(24)
         .frame(width: 300)
         .animation(.easeInOut(duration: 0.35), value: vm.sessionType)
+    }
+
+    // MARK: - Autocomplete
+
+    private var filteredSuggestions: [String] {
+        let all = StatsStore.shared.recentLabels(limit: 8)
+        let q = vm.taskLabel.trimmingCharacters(in: .whitespaces)
+        if q.isEmpty { return all }
+        return all.filter { $0.localizedCaseInsensitiveContains(q) && $0.lowercased() != q.lowercased() }
+    }
+
+    private var taskSuggestionsView: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(filteredSuggestions.prefix(5).enumerated()), id: \.element) { idx, label in
+                if idx > 0 { Divider() }
+                Button {
+                    vm.taskLabel = label
+                    isTaskFieldFocused = false
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 9))
+                            .foregroundStyle(.tertiary)
+                        Text(label)
+                            .font(.caption)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 10)
+                    .frame(height: 26)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .background(Color(NSColor.controlBackgroundColor))
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 7))
+        .overlay(RoundedRectangle(cornerRadius: 7).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .shadow(color: .black.opacity(0.12), radius: 3, y: 2)
     }
 
     private var goalFooter: some View {

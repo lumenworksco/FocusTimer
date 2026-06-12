@@ -96,6 +96,19 @@ final class StatsStore {
         return sessionLog.filter { $0.timestamp >= cutoff }
     }
 
+    func recentLabels(limit: Int = 8) -> [String] {
+        var seen = Set<String>()
+        var result: [String] = []
+        for entry in sessionLog.reversed() {
+            let label = entry.taskLabel.trimmingCharacters(in: .whitespaces)
+            guard !label.isEmpty, !seen.contains(label) else { continue }
+            seen.insert(label)
+            result.append(label)
+            if result.count >= limit { break }
+        }
+        return result
+    }
+
     // MARK: - Record
 
     func recordSession(durationMinutes: Int, taskLabel: String = "") {
