@@ -9,7 +9,7 @@ final class StatsWindowController {
     private init() {}
 
     func open() {
-        if let w = window {
+        if let w = window, w.isVisible {
             w.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
