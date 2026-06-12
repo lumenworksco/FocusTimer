@@ -234,14 +234,23 @@
       box-shadow: 0 4px 20px rgba(255,59,48,0.45);
     }
 
+    /* Task label field */
+    .task-label-row {
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.1px;
+    }
+
     /* Footer row */
     .popup-footer {
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex; flex-direction: column; gap: 6px;
       padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);
       font-size: 12px; color: rgba(255,255,255,0.25);
     }
-    .popup-footer .completed { display: flex; align-items: center; gap: 5px; }
-    .check-icon { color: var(--accent); }
+    .goal-row { display: flex; justify-content: space-between; align-items: center; }
+    .goal-track { height: 3px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; }
+    .goal-fill  { width: 25%; height: 100%; background: var(--accent); border-radius: 100px; }
 
     /* ── Features ── */
     .features {
@@ -389,11 +398,16 @@
               <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
             </svg>
             <svg class="popup-gear" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            <svg class="popup-gear" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"/>
               <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
             </svg>
           </div>
         </div>
+
+        <div class="task-label-row">Deep Work</div>
 
         <div class="ring-wrap">
           <svg viewBox="0 0 180 180" style="overflow:visible">
@@ -422,8 +436,14 @@
         </div>
 
         <div class="popup-footer">
-          <div class="completed"><span class="check-icon">✓</span> 1 completed today</div>
-          <div>Quit</div>
+          <div class="goal-row">
+            <div style="display:flex;align-items:center;gap:5px">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+              2 of 8 sessions today
+            </div>
+            <div>Quit</div>
+          </div>
+          <div class="goal-track"><div class="goal-fill"></div></div>
         </div>
       </div>
     </div>
