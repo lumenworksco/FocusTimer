@@ -27,7 +27,8 @@ struct StatsView: View {
             if tab == .overview {
                 summaryRow
                 Divider()
-                VStack(spacing: 16) {
+                VStack(spacing: 20) {
+                    heatmapSection
                     metricPicker
                     barChart
                 }
@@ -119,6 +120,163 @@ struct StatsView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Heatmap
+
+    private let heatmapWeeks = 16
+    private let cellSize: CGFloat = 11
+    private let cellGap: CGFloat = 2
+
+    private var heatmapData: [[StatsStore.DayStat?]] { buildHeatmap(weeks: heatmapWeeks) }
+    private var heatmapLabels: [String?] { monthLabels(for: heatmapData) }
+
+    private var heatmapSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            // Month labels row
+            HStack(alignment: .top, spacing: cellGap) {
+                Color.clear.frame(width: 14 + 4)
+                ForEach(0..<heatmapData.count, id: \.self) { w in
+                    Text(heatmapLabels[w] ?? "")
+                        .font(.system(size: 8))
+                        .foregroundStyle(.secondary)
+                        .opacity(heatmapLabels[w] != nil ? 1 : 0)
+                        .frame(width: cellSize, height: 10, alignment: .leading)
+                }
+            }
+
+            // Grid
+            HStack(alignment: .top, spacing: 4) {
+                // Day-of-week labels (M, W, F only to reduce clutter)
+                VStack(alignment: .trailing, spacing: cellGap) {
+                    ForEach(0..<7, id: \.self) { d in
+                        Text(["M", "", "W", "", "F", "", ""][d])
+                            .font(.system(size: 8))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 14, height: cellSize)
+                    }
+                }
+
+                // Week columns
+                HStack(alignment: .top, spacing: cellGap) {
+                    ForEach(0..<heatmapData.count, id: \.self) { w in
+                        VStack(spacing: cellGap) {
+                            ForEach(0..<7, id: \.self) { d in
+                                let stat = heatmapData[w][d]
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(cellColor(for: stat))
+                                    .frame(width: cellSize, height: cellSize)
+                                    .help(cellTooltip(stat))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Legend
+            HStack(spacing: 6) {
+                Spacer()
+                Text("Less")
+                    .font(.system(size: 8))
+                    .foregroundStyle(.tertiary)
+                ForEach([0, 1, 3, 5, 7], id: \.self) { level in
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(legendColor(level))
+                        .frame(width: 9, height: 9)
+                }
+                Text("More")
+                    .font(.system(size: 8))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.top, 2)
+        }
+    }
+
+    private func buildHeatmap(weeks n: Int) -> [[StatsStore.DayStat?]] {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let weekday = cal.component(.weekday, from: today)
+        let daysFromMonday = weekday == 1 ? 6 : weekday - 2
+        guard let thisMonday = cal.date(byAdding: .day, value: -daysFromMonday, to: today),
+              let startDate  = cal.date(byAdding: .weekOfYear, value: -(n - 1), to: thisMonday)
+        else { return [] }
+
+        let allDays = StatsStore.shared.history(days: n * 7 + 7)
+        var lookup: [String: StatsStore.DayStat] = [:]
+        for day in allDays { lookup[DateFormatter.yyyyMMdd.string(from: day.date)] = day }
+
+        var result: [[StatsStore.DayStat?]] = []
+        for w in 0..<n {
+            var week: [StatsStore.DayStat?] = []
+            for d in 0..<7 {
+                guard let date = cal.date(byAdding: .day, value: w * 7 + d, to: startDate) else {
+                    week.append(nil); continue
+                }
+                if date > today {
+                    week.append(nil)
+                } else {
+                    let key = DateFormatter.yyyyMMdd.string(from: date)
+                    week.append(lookup[key] ?? StatsStore.DayStat(date: date, sessions: 0, focusMinutes: 0))
+                }
+            }
+            result.append(week)
+        }
+        return result
+    }
+
+    private func monthLabels(for weeks: [[StatsStore.DayStat?]]) -> [String?] {
+        var labels = [String?]()
+        var prevMonth = -1
+        let cal = Calendar.current
+        let fmt = DateFormatter()
+        fmt.dateFormat = "MMM"
+        for week in weeks {
+            if let first = week.compactMap({ $0 }).first {
+                let m = cal.component(.month, from: first.date)
+                if m != prevMonth {
+                    labels.append(fmt.string(from: first.date))
+                    prevMonth = m
+                } else {
+                    labels.append(nil)
+                }
+            } else {
+                labels.append(nil)
+            }
+        }
+        return labels
+    }
+
+    private func cellColor(for stat: StatsStore.DayStat?) -> Color {
+        guard let stat = stat else { return .clear }
+        switch stat.sessions {
+        case 0:      return Color.secondary.opacity(0.1)
+        case 1:      return Color.red.opacity(0.3)
+        case 2...3:  return Color.red.opacity(0.55)
+        case 4...5:  return Color.red.opacity(0.75)
+        default:     return Color.red
+        }
+    }
+
+    private func legendColor(_ level: Int) -> Color {
+        switch level {
+        case 0:  return Color.secondary.opacity(0.1)
+        case 1:  return Color.red.opacity(0.3)
+        case 3:  return Color.red.opacity(0.55)
+        case 5:  return Color.red.opacity(0.75)
+        default: return Color.red
+        }
+    }
+
+    private func cellTooltip(_ stat: StatsStore.DayStat?) -> String {
+        guard let stat = stat else { return "" }
+        let fmt = DateFormatter()
+        fmt.dateFormat = "EEEE, MMM d"
+        let ds = fmt.string(from: stat.date)
+        switch stat.sessions {
+        case 0:  return "\(ds) · no sessions"
+        case 1:  return "\(ds) · 1 session"
+        default: return "\(ds) · \(stat.sessions) sessions"
+        }
     }
 
     // MARK: - Metric picker
