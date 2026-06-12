@@ -18,6 +18,13 @@ final class StatsStore {
         } else {
             records = [:]
         }
+        let logData = UserDefaults.standard.data(forKey: "v1_session_log")
+        if let data = logData,
+           let decoded = try? JSONDecoder().decode([SessionEntry].self, from: data) {
+            sessionLog = decoded
+        } else {
+            sessionLog = []
+        }
     }
 
     var todaySessions: Int     { records[todayKey]?.sessions     ?? 0 }
@@ -72,11 +79,36 @@ final class StatsStore {
         }
     }
 
-    func recordSession(durationMinutes: Int) {
+    // MARK: - Session log
+
+    struct SessionEntry: Codable, Identifiable {
+        var id: UUID = UUID()
+        let timestamp: Date
+        let durationMinutes: Int
+        let taskLabel: String
+    }
+
+    private let logKey = "v1_session_log"
+    private(set) var sessionLog: [SessionEntry]
+
+    func recentEntries(days: Int) -> [SessionEntry] {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
+        return sessionLog.filter { $0.timestamp >= cutoff }
+    }
+
+    // MARK: - Record
+
+    func recordSession(durationMinutes: Int, taskLabel: String = "") {
         var record = records[todayKey] ?? DayRecord()
         record.sessions += 1
         record.focusMinutes += durationMinutes
         records[todayKey] = record
+
+        let entry = SessionEntry(timestamp: Date(), durationMinutes: durationMinutes, taskLabel: taskLabel)
+        sessionLog.append(entry)
+        if sessionLog.count > 500 { sessionLog.removeFirst(sessionLog.count - 500) }
+        persistLog()
+
         persist()
     }
 
@@ -89,6 +121,12 @@ final class StatsStore {
     private func persist() {
         if let data = try? JSONEncoder().encode(records) {
             UserDefaults.standard.set(data, forKey: udKey)
+        }
+    }
+
+    private func persistLog() {
+        if let data = try? JSONEncoder().encode(sessionLog) {
+            UserDefaults.standard.set(data, forKey: logKey)
         }
     }
 }

@@ -2,8 +2,14 @@ import SwiftUI
 import Charts
 
 struct StatsView: View {
+    @State private var tab: Tab = .overview
     @State private var metric: Metric = .sessions
     @State private var range: Int = 28
+
+    enum Tab: String, CaseIterable {
+        case overview = "Overview"
+        case log      = "Session Log"
+    }
 
     enum Metric: String, CaseIterable {
         case sessions  = "Sessions"
@@ -16,15 +22,21 @@ struct StatsView: View {
         VStack(spacing: 0) {
             header
             Divider()
-            summaryRow
+            tabBar
             Divider()
-            VStack(spacing: 16) {
-                metricPicker
-                barChart
+            if tab == .overview {
+                summaryRow
+                Divider()
+                VStack(spacing: 16) {
+                    metricPicker
+                    barChart
+                }
+                .padding(24)
+                Divider()
+                footerRow
+            } else {
+                logView
             }
-            .padding(24)
-            Divider()
-            footerRow
         }
         .frame(width: 500)
     }
@@ -47,6 +59,17 @@ struct StatsView: View {
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
+    }
+
+    // MARK: - Tab bar
+
+    private var tabBar: some View {
+        Picker("", selection: $tab) {
+            ForEach(Tab.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+        }
+        .pickerStyle(.segmented)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 10)
     }
 
     // MARK: - Summary
@@ -170,6 +193,110 @@ struct StatsView: View {
             Text(value).font(.caption.weight(.semibold))
             Text(label).font(.caption2).foregroundStyle(.secondary)
         }
+    }
+
+    // MARK: - Session Log
+
+    private var logView: some View {
+        let groups = logGroups
+        return Group {
+            if groups.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "clock.badge.xmark")
+                        .font(.system(size: 32))
+                        .foregroundStyle(.tertiary)
+                    Text("No sessions in this range")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                    Text("Complete a work session to see your log.")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 48)
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 0, pinnedViews: []) {
+                        ForEach(groups) { group in
+                            Text(group.dateLabel)
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 24)
+                                .padding(.top, 16)
+                                .padding(.bottom, 6)
+
+                            ForEach(group.entries) { entry in
+                                logRow(entry)
+                                if entry.id != group.entries.last?.id {
+                                    Divider().padding(.leading, 24)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.bottom, 16)
+                }
+                .frame(maxHeight: 320)
+            }
+        }
+    }
+
+    private func logRow(_ entry: StatsStore.SessionEntry) -> some View {
+        HStack(spacing: 12) {
+            Text(timeString(entry.timestamp))
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .frame(width: 64, alignment: .leading)
+
+            Text(entry.taskLabel.isEmpty ? "—" : entry.taskLabel)
+                .font(.callout)
+                .foregroundStyle(entry.taskLabel.isEmpty ? .tertiary : .primary)
+                .lineLimit(1)
+                .truncationMode(.tail)
+
+            Spacer()
+
+            Text("\(entry.durationMinutes)m")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 24)
+        .frame(height: 38)
+    }
+
+    private struct DayGroup: Identifiable {
+        let date: Date
+        let dateLabel: String
+        let entries: [StatsStore.SessionEntry]
+        var id: Date { date }
+    }
+
+    private var logGroups: [DayGroup] {
+        let entries = StatsStore.shared.recentEntries(days: range)
+        let cal = Calendar.current
+        let grouped = Dictionary(grouping: entries) { cal.startOfDay(for: $0.timestamp) }
+        return grouped.keys.sorted(by: >).map { date in
+            DayGroup(
+                date: date,
+                dateLabel: dayGroupLabel(date),
+                entries: (grouped[date] ?? []).sorted { $0.timestamp > $1.timestamp }
+            )
+        }
+    }
+
+    private func dayGroupLabel(_ date: Date) -> String {
+        let cal = Calendar.current
+        if cal.isDateInToday(date) { return "Today" }
+        if cal.isDateInYesterday(date) { return "Yesterday" }
+        let fmt = DateFormatter()
+        fmt.dateFormat = "EEE, MMM d"
+        return fmt.string(from: date)
+    }
+
+    private func timeString(_ date: Date) -> String {
+        let fmt = DateFormatter()
+        fmt.timeStyle = .short
+        fmt.dateStyle = .none
+        return fmt.string(from: date)
     }
 
     // MARK: - Helpers

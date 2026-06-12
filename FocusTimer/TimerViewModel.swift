@@ -240,7 +240,7 @@ final class TimerViewModel: ObservableObject {
 
         if sessionType == .work {
             completedPomodoros += 1
-            StatsStore.shared.recordSession(durationMinutes: workDuration)
+            StatsStore.shared.recordSession(durationMinutes: workDuration, taskLabel: taskLabel)
             syncStats()
         }
 
