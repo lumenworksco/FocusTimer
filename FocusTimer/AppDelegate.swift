@@ -71,6 +71,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             .font: NSFont.monospacedDigitSystemFont(ofSize: 13, weight: .regular)
         ]))
 
+        // Optional task label
+        if viewModel.showTaskLabelInMenuBar, !viewModel.taskLabel.isEmpty {
+            let raw = viewModel.taskLabel
+            let truncated = raw.count > 20 ? String(raw.prefix(19)) + "…" : raw
+            result.append(NSAttributedString(string: "  " + truncated, attributes: [
+                .foregroundColor: NSColor.secondaryLabelColor,
+                .font: NSFont.systemFont(ofSize: 11, weight: .regular)
+            ]))
+        }
+
         button.attributedTitle = result
         button.image = nil
     }

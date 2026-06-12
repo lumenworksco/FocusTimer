@@ -45,6 +45,9 @@ final class TimerViewModel: ObservableObject {
     @Published var autoAdvance: Bool {
         didSet { UserDefaults.standard.set(autoAdvance, forKey: "autoAdvance") }
     }
+    @Published var showTaskLabelInMenuBar: Bool {
+        didSet { UserDefaults.standard.set(showTaskLabelInMenuBar, forKey: "showTaskLabelInMenuBar") }
+    }
     @Published var hotkeysEnabled: Bool {
         didSet {
             UserDefaults.standard.set(hotkeysEnabled, forKey: "hotkeysEnabled")
@@ -96,6 +99,7 @@ final class TimerViewModel: ObservableObject {
         let goal = ud.integer(forKey: "dailyGoal")
         dailyGoal = goal > 0 ? goal : 8
         autoAdvance = ud.object(forKey: "autoAdvance") as? Bool ?? true
+        showTaskLabelInMenuBar = ud.object(forKey: "showTaskLabelInMenuBar") as? Bool ?? false
         hotkeysEnabled = ud.object(forKey: "hotkeysEnabled") as? Bool ?? true
         let soundRaw = ud.string(forKey: "notificationSound") ?? NotificationSound.systemDefault.rawValue
         notificationSound = NotificationSound(rawValue: soundRaw) ?? .systemDefault

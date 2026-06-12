@@ -42,6 +42,10 @@ struct SettingsView: View {
                     Toggle("", isOn: $vm.autoAdvance).labelsHidden()
                 }
                 Divider()
+                settingRow("Show label in menu bar") {
+                    Toggle("", isOn: $vm.showTaskLabelInMenuBar).labelsHidden()
+                }
+                Divider()
                 settingRow("Pause when idle") {
                     Toggle("", isOn: $vm.idleDetectionEnabled).labelsHidden()
                 }
