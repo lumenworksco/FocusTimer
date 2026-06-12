@@ -76,6 +76,30 @@ final class NotificationManager {
         UNUserNotificationCenter.current().add(request)
     }
 
+    func sendMilestone(sessions: Int, focusMinutes: Int) {
+        let content = UNMutableNotificationContent()
+        let formatted = sessions >= 1000
+            ? sessions.formatted(.number)
+            : "\(sessions)"
+        content.title = "\(formatted) sessions completed"
+        let hours = focusMinutes / 60
+        content.body = switch sessions {
+        case 10:   "A solid start — keep the habit going."
+        case 50:   "50 down. You're building something real."
+        case 100:  hours > 0 ? "That's \(hours)+ hours of deep work. Keep it up." : "A major milestone — keep it up."
+        case 500:  hours > 0 ? "\(hours) hours focused. Serious dedication." : "Serious dedication."
+        case 1000: hours > 0 ? "\(hours) hours of deep work. Elite level." : "Elite level."
+        default:   "Keep it up!"
+        }
+        content.sound = .default
+        let request = UNNotificationRequest(
+            identifier: "milestone-\(sessions)",
+            content: content,
+            trigger: nil
+        )
+        UNUserNotificationCenter.current().add(request)
+    }
+
     func sendWeeklyDigest(sessions: Int, minutes: Int, streak: Int) {
         let content = UNMutableNotificationContent()
         content.title = "Weekly focus summary"

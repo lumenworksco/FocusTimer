@@ -111,6 +111,9 @@ final class StatsStore {
 
     // MARK: - Record
 
+    var allTimeSessions:    Int { records.values.reduce(0) { $0 + $1.sessions } }
+    var allTimeFocusMinutes: Int { records.values.reduce(0) { $0 + $1.focusMinutes } }
+
     func recordSession(durationMinutes: Int, taskLabel: String = "") {
         var record = records[todayKey] ?? DayRecord()
         record.sessions += 1
@@ -121,8 +124,23 @@ final class StatsStore {
         sessionLog.append(entry)
         if sessionLog.count > 500 { sessionLog.removeFirst(sessionLog.count - 500) }
         persistLog()
-
         persist()
+
+        checkMilestone(totalSessions: allTimeSessions)
+    }
+
+    // MARK: - Milestones
+
+    private static let milestones = [10, 50, 100, 500, 1000]
+    private static let milestoneKey = "v1_milestones_reached"
+
+    private func checkMilestone(totalSessions: Int) {
+        var reached = Set(UserDefaults.standard.array(forKey: Self.milestoneKey) as? [Int] ?? [])
+        let unfired = Self.milestones.filter { totalSessions >= $0 && !reached.contains($0) }
+        guard let highest = unfired.max() else { return }
+        unfired.forEach { reached.insert($0) }
+        UserDefaults.standard.set(Array(reached), forKey: Self.milestoneKey)
+        NotificationManager.shared.sendMilestone(sessions: highest, focusMinutes: allTimeFocusMinutes)
     }
 
     private var todayKey: String { key(for: Date()) }
