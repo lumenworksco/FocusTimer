@@ -371,9 +371,13 @@ struct ContentView: View {
 
     private var statusLabel: String {
         if vm.isRunning {
-            return vm.taskLabel.trimmingCharacters(in: .whitespaces) == "🍅"
-                ? "🍅 in progress"
-                : "in progress"
+            switch vm.taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
+            case "🍅":                  return "🍅 in progress"
+            case "coffee", "☕":        return "☕ brewing"
+            case "42":                  return "the answer 🌌"
+            case "debug", "debugging": return "🐛 squashing bugs"
+            default:                    return "in progress"
+            }
         }
         if vm.progress > 0 { return "paused" }
         return "ready"

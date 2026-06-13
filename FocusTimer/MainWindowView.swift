@@ -391,10 +391,13 @@ struct MainWindowView: View {
 
     private var statusLabel: String {
         if vm.isRunning {
-            // 🍅 easter egg: name your session "🍅" to honour the technique's Italian roots
-            return vm.taskLabel.trimmingCharacters(in: .whitespaces) == "🍅"
-                ? "🍅 in progress"
-                : "in progress"
+            switch vm.taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
+            case "🍅":                  return "🍅 in progress"
+            case "coffee", "☕":        return "☕ brewing"
+            case "42":                  return "the answer 🌌"
+            case "debug", "debugging": return "🐛 squashing bugs"
+            default:                    return "in progress"
+            }
         }
         if vm.progress > 0 { return "paused" }
         return "ready"

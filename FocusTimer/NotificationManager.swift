@@ -54,9 +54,16 @@ final class NotificationManager {
         switch type {
         case .work:
             content.title = "Work session complete!"
-            if taskLabel.trimmingCharacters(in: .whitespaces) == "🍅" {
+            switch taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
+            case "🍅":
                 content.body = "Pomodoro complete! 🍅 Take a well-earned break."
-            } else {
+            case "coffee", "☕":
+                content.body = "Caffeine-fueled session complete ☕ — time to stretch."
+            case "42":
+                content.body = "42 minutes of deep thought. Don't panic. 🌌"
+            case "debug", "debugging":
+                content.body = "Bug squashing session complete 🐛 How many did you get?"
+            default:
                 content.body = taskLabel.isEmpty
                     ? "Time to take a break. Great focus session."
                     : "\(taskLabel) — take a well-earned break."
