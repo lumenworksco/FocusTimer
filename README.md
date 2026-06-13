@@ -59,6 +59,10 @@
 - **Weekly digest** — Sunday evening summary of sessions, focus time, and streak
 - **Milestone celebrations** — one-time notifications at 10, 50, 100, 500, and 1,000 sessions
 
+### Social
+- **Focus friends** — add friends by username and see their session count, focus time, and streak in the Social window
+- **Supabase sync** — stats sync in the background so friend data is always current (optional; app works fully offline without it)
+
 ### Comfort
 - **Break prompts** — a rotating micro-action suggestion on every break (stand up, breathe, etc.)
 - **Global hotkeys** — customizable keyboard shortcuts to start/pause and skip from anywhere
