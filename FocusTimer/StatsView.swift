@@ -136,49 +136,56 @@ struct StatsView: View {
 
     private var heatmapSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            // Month labels row
-            HStack(alignment: .top, spacing: cellGap) {
-                Color.clear.frame(width: 14 + 4)
-                ForEach(0..<heatmapData.count, id: \.self) { w in
-                    Color.clear
-                        .frame(width: cellSize, height: 10)
-                        .overlay(alignment: .leading) {
-                            if let label = heatmapLabels[w] {
-                                Text(label)
+            // Center the grid block horizontally
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                VStack(alignment: .leading, spacing: 4) {
+                    // Month labels row
+                    HStack(alignment: .top, spacing: cellGap) {
+                        Color.clear.frame(width: 14 + 4)
+                        ForEach(0..<heatmapData.count, id: \.self) { w in
+                            Color.clear
+                                .frame(width: cellSize, height: 10)
+                                .overlay(alignment: .leading) {
+                                    if let label = heatmapLabels[w] {
+                                        Text(label)
+                                            .font(.system(size: 8))
+                                            .foregroundStyle(.secondary)
+                                            .fixedSize()
+                                    }
+                                }
+                        }
+                    }
+
+                    // Grid
+                    HStack(alignment: .top, spacing: 4) {
+                        // Day-of-week labels (M, W, F only)
+                        VStack(alignment: .trailing, spacing: cellGap) {
+                            ForEach(0..<7, id: \.self) { d in
+                                Text(["M", "", "W", "", "F", "", ""][d])
                                     .font(.system(size: 8))
                                     .foregroundStyle(.secondary)
-                                    .fixedSize()
+                                    .frame(width: 14, height: cellSize)
                             }
                         }
-                }
-            }
 
-            // Grid
-            HStack(alignment: .top, spacing: 4) {
-                // Day-of-week labels (M, W, F only to reduce clutter)
-                VStack(alignment: .trailing, spacing: cellGap) {
-                    ForEach(0..<7, id: \.self) { d in
-                        Text(["M", "", "W", "", "F", "", ""][d])
-                            .font(.system(size: 8))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 14, height: cellSize)
-                    }
-                }
-
-                // Week columns
-                HStack(alignment: .top, spacing: cellGap) {
-                    ForEach(0..<heatmapData.count, id: \.self) { w in
-                        VStack(spacing: cellGap) {
-                            ForEach(0..<7, id: \.self) { d in
-                                let stat = heatmapData[w][d]
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(cellColor(for: stat))
-                                    .frame(width: cellSize, height: cellSize)
-                                    .help(cellTooltip(stat))
+                        // Week columns
+                        HStack(alignment: .top, spacing: cellGap) {
+                            ForEach(0..<heatmapData.count, id: \.self) { w in
+                                VStack(spacing: cellGap) {
+                                    ForEach(0..<7, id: \.self) { d in
+                                        let stat = heatmapData[w][d]
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .fill(cellColor(for: stat))
+                                            .frame(width: cellSize, height: cellSize)
+                                            .help(cellTooltip(stat))
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                Spacer(minLength: 0)
             }
 
             // Legend
@@ -235,15 +242,21 @@ struct StatsView: View {
     private func monthLabels(for weeks: [[StatsStore.DayStat?]]) -> [String?] {
         var labels = [String?]()
         var prevMonth = -1
+        var lastLabelIdx = -4
         let cal = Calendar.current
         let fmt = DateFormatter()
         fmt.dateFormat = "MMM"
-        for week in weeks {
+        for (idx, week) in weeks.enumerated() {
             if let first = week.compactMap({ $0 }).first {
                 let m = cal.component(.month, from: first.date)
                 if m != prevMonth {
-                    labels.append(fmt.string(from: first.date))
                     prevMonth = m
+                    if idx - lastLabelIdx >= 3 {
+                        labels.append(fmt.string(from: first.date))
+                        lastLabelIdx = idx
+                    } else {
+                        labels.append(nil)
+                    }
                 } else {
                     labels.append(nil)
                 }
