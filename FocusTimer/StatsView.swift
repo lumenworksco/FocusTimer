@@ -128,82 +128,72 @@ struct StatsView: View {
     // MARK: - Heatmap
 
     private let heatmapWeeks = 16
-    private let cellSize: CGFloat = 11
-    private let cellGap: CGFloat = 2
+    private let cellSize: CGFloat = 24
+    private let cellGap: CGFloat = 3
 
     private var heatmapData: [[StatsStore.DayStat?]] { buildHeatmap(weeks: heatmapWeeks) }
     private var heatmapLabels: [String?] { monthLabels(for: heatmapData) }
 
     private var heatmapSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            // Center the grid block horizontally
-            HStack(spacing: 0) {
-                Spacer(minLength: 0)
-                VStack(alignment: .leading, spacing: 4) {
-                    // Month labels row
-                    HStack(alignment: .top, spacing: cellGap) {
-                        Color.clear.frame(width: 14 + 4)
-                        ForEach(0..<heatmapData.count, id: \.self) { w in
-                            Color.clear
-                                .frame(width: cellSize, height: 10)
-                                .overlay(alignment: .leading) {
-                                    if let label = heatmapLabels[w] {
-                                        Text(label)
-                                            .font(.system(size: 8))
-                                            .foregroundStyle(.secondary)
-                                            .fixedSize()
-                                    }
-                                }
-                        }
-                    }
-
-                    // Grid
-                    HStack(alignment: .top, spacing: 4) {
-                        // Day-of-week labels (M, W, F only)
-                        VStack(alignment: .trailing, spacing: cellGap) {
-                            ForEach(0..<7, id: \.self) { d in
-                                Text(["M", "", "W", "", "F", "", ""][d])
-                                    .font(.system(size: 8))
+        VStack(alignment: .leading, spacing: 6) {
+            // Month labels row
+            HStack(alignment: .top, spacing: cellGap) {
+                Color.clear.frame(width: 18)
+                ForEach(0..<heatmapData.count, id: \.self) { w in
+                    Color.clear
+                        .frame(width: cellSize, height: 12)
+                        .overlay(alignment: .leading) {
+                            if let label = heatmapLabels[w] {
+                                Text(label)
+                                    .font(.system(size: 9))
                                     .foregroundStyle(.secondary)
-                                    .frame(width: 14, height: cellSize)
+                                    .fixedSize()
                             }
                         }
+                }
+            }
 
-                        // Week columns
-                        HStack(alignment: .top, spacing: cellGap) {
-                            ForEach(0..<heatmapData.count, id: \.self) { w in
-                                VStack(spacing: cellGap) {
-                                    ForEach(0..<7, id: \.self) { d in
-                                        let stat = heatmapData[w][d]
-                                        RoundedRectangle(cornerRadius: 2)
-                                            .fill(cellColor(for: stat))
-                                            .frame(width: cellSize, height: cellSize)
-                                            .help(cellTooltip(stat))
-                                    }
-                                }
-                            }
+            // Grid
+            HStack(alignment: .top, spacing: cellGap) {
+                // Day-of-week labels
+                VStack(alignment: .trailing, spacing: cellGap) {
+                    ForEach(0..<7, id: \.self) { d in
+                        Text(["M", "", "W", "", "F", "", ""][d])
+                            .font(.system(size: 9))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 14, height: cellSize)
+                    }
+                }
+
+                // Week columns
+                ForEach(0..<heatmapData.count, id: \.self) { w in
+                    VStack(spacing: cellGap) {
+                        ForEach(0..<7, id: \.self) { d in
+                            let stat = heatmapData[w][d]
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(cellColor(for: stat))
+                                .frame(width: cellSize, height: cellSize)
+                                .help(cellTooltip(stat))
                         }
                     }
                 }
-                Spacer(minLength: 0)
             }
 
             // Legend
             HStack(spacing: 6) {
                 Spacer()
                 Text("Less")
-                    .font(.system(size: 8))
+                    .font(.system(size: 9))
                     .foregroundStyle(.tertiary)
                 ForEach([0, 1, 3, 5, 7], id: \.self) { level in
-                    RoundedRectangle(cornerRadius: 2)
+                    RoundedRectangle(cornerRadius: 3)
                         .fill(legendColor(level))
-                        .frame(width: 9, height: 9)
+                        .frame(width: 11, height: 11)
                 }
                 Text("More")
-                    .font(.system(size: 8))
+                    .font(.system(size: 9))
                     .foregroundStyle(.tertiary)
             }
-            .padding(.top, 2)
         }
     }
 
@@ -428,6 +418,7 @@ struct StatsView: View {
             ForEach(Metric.allCases, id: \.self) { Text($0.rawValue).tag($0) }
         }
         .pickerStyle(.segmented)
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Chart
