@@ -140,11 +140,16 @@ struct StatsView: View {
             HStack(alignment: .top, spacing: cellGap) {
                 Color.clear.frame(width: 14 + 4)
                 ForEach(0..<heatmapData.count, id: \.self) { w in
-                    Text(heatmapLabels[w] ?? "")
-                        .font(.system(size: 8))
-                        .foregroundStyle(.secondary)
-                        .opacity(heatmapLabels[w] != nil ? 1 : 0)
-                        .frame(width: cellSize, height: 10, alignment: .leading)
+                    Color.clear
+                        .frame(width: cellSize, height: 10)
+                        .overlay(alignment: .leading) {
+                            if let label = heatmapLabels[w] {
+                                Text(label)
+                                    .font(.system(size: 8))
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize()
+                            }
+                        }
                 }
             }
 
