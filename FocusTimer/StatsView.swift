@@ -414,11 +414,24 @@ struct StatsView: View {
     // MARK: - Metric picker
 
     private var metricPicker: some View {
-        Picker("", selection: $metric) {
-            ForEach(Metric.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+        HStack(spacing: 2) {
+            ForEach(Metric.allCases, id: \.self) { m in
+                Button { metric = m } label: {
+                    Text(m.rawValue)
+                        .font(.subheadline.weight(metric == m ? .semibold : .regular))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 5)
+                        .background(metric == m ? Color.accentColor.opacity(0.15) : Color.clear)
+                        .foregroundStyle(metric == m ? Color.accentColor : .secondary)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+                .buttonStyle(.plain)
+            }
         }
-        .pickerStyle(.segmented)
-        .frame(maxWidth: .infinity)
+        .padding(3)
+        .background(Color(NSColor.controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.2), lineWidth: 1))
     }
 
     // MARK: - Chart

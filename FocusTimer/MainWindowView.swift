@@ -6,6 +6,8 @@ struct MainWindowView: View {
     @ObservedObject private var updaterW = AutoUpdater.shared
     @State private var glowOpacity: Double = 0.0
     @State private var breakPrompt: String = ""
+    @State private var ringTapCount = 0
+    @State private var secretActive = false
     @FocusState private var isTaskFieldFocused: Bool
 
     private static let breakPrompts = [
@@ -209,6 +211,15 @@ struct MainWindowView: View {
                 withAnimation(.easeOut(duration: 0.4)) { glowOpacity = 0.0 }
             }
         }
+        .onTapGesture {
+            ringTapCount += 1
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { ringTapCount = 0 }
+            if ringTapCount >= 5 {
+                ringTapCount = 0
+                secretActive = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { secretActive = false }
+            }
+        }
     }
 
     // MARK: - Dots
@@ -390,6 +401,7 @@ struct MainWindowView: View {
     // MARK: - Helpers
 
     private var statusLabel: String {
+        if secretActive { return "🎉 you found it!" }
         if vm.isRunning {
             switch vm.taskLabel.trimmingCharacters(in: .whitespaces).lowercased() {
             case "🍅":                  return "🍅 in progress"
